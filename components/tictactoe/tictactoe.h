@@ -11,7 +11,7 @@ typedef enum
 typedef struct
 {
    int index_of_X[MAX_SYMBOLS_ON_FIELD];
-   int index_of_Y[MAX_SYMBOLS_ON_FIELD];
+   int index_of_O[MAX_SYMBOLS_ON_FIELD];
    tictactoe_turn_t turn;
 } tictactoe_handler_t;
 

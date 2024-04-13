@@ -17,6 +17,7 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include <stdio.h>
+#include <string.h>
 
 //---------------------------------- MACROS -----------------------------------
 
@@ -37,6 +38,7 @@ static TaskHandle_t p_tictactoe_task = NULL;
 QueueHandle_t p_tictactoe_queue = NULL;
 tictactoe_turn_t playerX = DEVICE;
 extern QueueHandle_t gui_queue;
+tictactoe_handler_t game;
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void tictactoe_init(void)
@@ -49,6 +51,7 @@ void tictactoe_init(void)
       printf("User interface queue was not initialized successfully\n");
       return;
    }
+   memset(&game, 0, sizeof(game));
 }
 
 void tictactoe_first_move()
@@ -59,11 +62,16 @@ void tictactoe_first_move()
       if (gui_event == GUI_APP_EVENT_ME_FIRST_BUTTON_PRESSED)
       {
          playerX = DEVICE;
+         game.index_of_X[1] = 1;
+         game.turn = playerX;
       }
       else if (gui_event == GUI_APP_EVENT_ME_FIRST_BUTTON_PRESSED)
       {
          playerX = SERVER;
+         game.turn = playerX;
       }
+      if (p_tictactoe_queue != NULL)
+         xQueueSend(p_tictactoe_queue, &game, 0U);
    }
 
    if (pdPASS != xTaskCreate(&_tictactoe_task, "tictactoe_task", 2 * 1024, NULL, 5, &p_tictactoe_task))
