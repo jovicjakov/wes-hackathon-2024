@@ -30,6 +30,7 @@
  * @param [in] p_parameter This is the parameter that is passed to the task.
  */
 static void _tictactoe_task(void *p_parameter);
+static void tictactoe_first_move_task(void *p_parameter);
 
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 static TaskHandle_t p_tictactoe_task = NULL;
@@ -52,32 +53,48 @@ void tictactoe_init(void)
       return;
    }
    memset(&game, 0, sizeof(game));
+   TaskHandle_t p_tictactoe_first_move_task = NULL;
+   if (pdPASS != xTaskCreate(&tictactoe_first_move_task, "tictactoe_first_move_task", 2 * 1024, NULL, 5, &p_tictactoe_first_move_task))
+   {
+      printf("tictactoe_first_move_task was not initialized successfully\n");
+      return;
+   }
 }
 
-void tictactoe_first_move()
+static void tictactoe_first_move_task()
 {
    gui_app_event_t gui_event;
-   if ((gui_queue != NULL) && (xQueueReceive(gui_queue, &gui_event, 0U) == pdTRUE))
+   for (;;)
    {
-      if (gui_event == GUI_APP_EVENT_ME_FIRST_BUTTON_PRESSED)
-      {
-         playerX = DEVICE;
-         game.index_of_X[1] = 1;
-         game.turn = playerX;
-      }
-      else if (gui_event == GUI_APP_EVENT_ME_FIRST_BUTTON_PRESSED)
-      {
-         playerX = SERVER;
-         game.turn = playerX;
-      }
-      if (p_tictactoe_queue != NULL)
-         xQueueSend(p_tictactoe_queue, &game, 0U);
-   }
 
-   if (pdPASS != xTaskCreate(&_tictactoe_task, "tictactoe_task", 2 * 1024, NULL, 5, &p_tictactoe_task))
+      if ((gui_queue != NULL) && (xQueueReceive(gui_queue, &gui_event, 0U) == pdTRUE))
+      {
+         printf("ttt: recieved bttn press\n");
+         if (gui_event == GUI_APP_EVENT_ME_FIRST_BUTTON_PRESSED)
+         {
+            playerX = DEVICE;
+            game.index_of_X[1] = 1;
+            game.turn = playerX;
+         }
+         else if (gui_event == GUI_APP_EVENT_ME_FIRST_BUTTON_PRESSED)
+         {
+            playerX = SERVER;
+            game.turn = playerX;
+         }
+         if (p_tictactoe_queue != NULL)
+         {
+            printf("ttt: sending struct to mqqt task\n");
+            xQueueSend(p_tictactoe_queue, &game, 0U);
+         }
+         if (pdPASS != xTaskCreate(&_tictactoe_task, "tictactoe_task", 2 * 1024, NULL, 5, &p_tictactoe_task))
+         {
+            printf("User interface task was not initialized successfully\n");
+         }
+         break;
+      }
+   }
+   for (;;)
    {
-      printf("User interface task was not initialized successfully\n");
-      return;
    }
 }
 
@@ -90,7 +107,7 @@ static void _tictactoe_task(void *p_parameter)
       /* Blockingly wait on an event. */
       if ((p_tictactoe_queue != NULL) && (xQueueReceive(p_tictactoe_queue, &tictactoe_event, portMAX_DELAY) == pdTRUE))
       {
-         printf("GUI event received \n");
+         printf("MQTT event received \n");
       }
    }
 }
