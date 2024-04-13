@@ -1,0 +1,666 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6992
+load:0x40078000,len:15512
+load:0x40080400,len:3864
+entry 0x40080650
+[0;32mI (27) boot: ESP-IDF v5.0.4-dirty 2nd stage bootloader[0m
+[0;32mI (27) boot: compile time 21:02:31[0m
+[0;32mI (27) boot: Multicore bootloader[0m
+[0;32mI (31) boot: chip revision: v3.0[0m
+[0;32mI (35) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (40) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (44) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (49) boot: Enabling RNG early entropy source...[0m
+[0;32mI (54) boot: Partition Table:[0m
+[0;32mI (58) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (65) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (72) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (80) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (87) boot: End of partition table[0m
+[0;32mI (91) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=3cd74h (249204) map[0m
+[0;32mI (190) esp_image: segment 1: paddr=0004cd9c vaddr=3ffb0000 size=0327ch ( 12924) load[0m
+[0;32mI (195) esp_image: segment 2: paddr=00050020 vaddr=400d0020 size=ccb3ch (838460) map[0m
+[0;32mI (499) esp_image: segment 3: paddr=0011cb64 vaddr=3ffb327c size=00454h (  1108) load[0m
+[0;32mI (499) esp_image: segment 4: paddr=0011cfc0 vaddr=40080000 size=18274h ( 98932) load[0m
+[0;32mI (557) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (557) boot: Disabling RNG early entropy source...[0m
+[0;32mI (569) cpu_start: Multicore app[0m
+[0;32mI (569) cpu_start: Pro cpu up.[0m
+[0;32mI (569) cpu_start: Starting app cpu, entry point is 0x400814d0[0m
+[0;32mI (0) cpu_start: App cpu up.[0m
+[0;32mI (589) cpu_start: Pro cpu start user code[0m
+[0;32mI (589) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (589) cpu_start: Application information:[0m
+[0;32mI (594) cpu_start: Project name:     esp32_gui[0m
+[0;32mI (599) cpu_start: App version:      b36ffd7-dirty[0m
+[0;32mI (604) cpu_start: Compile time:     Apr 13 2024 21:02:24[0m
+[0;32mI (610) cpu_start: ELF file SHA256:  b4803917e8414283...[0m
+[0;32mI (616) cpu_start: ESP-IDF:          v5.0.4-dirty[0m
+[0;32mI (622) cpu_start: Min chip rev:     v0.0[0m
+[0;32mI (626) cpu_start: Max chip rev:     v3.99 [0m
+[0;32mI (631) cpu_start: Chip rev:         v3.0[0m
+[0;32mI (636) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (643) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (649) heap_init: At 3FFC3ED0 len 0001C130 (112 KiB): DRAM[0m
+[0;32mI (656) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (662) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (668) heap_init: At 40098274 len 00007D8C (31 KiB): IRAM[0m
+[0;32mI (676) spi_flash: detected chip: generic[0m
+[0;32mI (679) spi_flash: flash io: dio[0m
+[0;33mW (683) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (697) app_start: Starting scheduler on CPU0[0m
+[0;32m[0;32mI (701) app_start: Starting scheduler on CPU1[0m
+I (701) main_task: Started on CPU0[0m
+[0;32mI (711) main_task: Calling app_main()[0m
+[0;32mI (711) MY_MQTT: [APP] Startup..[0m
+[0;32mI (711) MY_MQTT: [APP] Free memory: 218052 bytes[0m
+[0;32mI (721) MY_MQTT: [APP] IDF version: v5.0.4-dirty[0m
+[0;32mI (731) lvgl_helpers: Display hor size: 320, ver size: 240[0m
+[0;32mI (741) example_connect: Start example_connect.[0m
+I (761) wifi:wifi driver task: 3ffce8dc, prio:23, stack:6656, core=0
+[0;32mI (761) system_api: Base MAC address is not set[0m
+[0;32mI (761) system_api: read default base MAC address from EFUSE[0m
+[0;32mI (741) lvgl_helpers: Display buffer size: 12800[0m
+I (771) wifi:wifi firmware version: e2d0ad8
+I (771) wifi:wifi certification version: v7.0
+I (781) wifi:config NVS flash: enabled
+I (781) wifi:config nano formating: disabled
+I (791) wifi:Init data frame dynamic rx buffer num: 32
+I (791) wifi:Init management frame dynamic rx buffer num: 32
+I (801) wifi:Init management short buffer num: 32
+I (801) wifi:Init dynamic tx buffer num: 32
+I (801) wifi:Init static rx buffer size: 1600
+I (811) wifi:Init static rx buffer num: 10
+I (811) wifi:Init dynamic rx buffer num: 32
+[0;32mI (821) wifi_init: rx ba win: 6[0m
+[0;32mI (821) wifi_init: tcpip mbox: 32[0m
+[0;32mI (821) wifi_init: udp mbox: 6[0m
+[0;32mI (831) wifi_init: tcp mbox: 6[0m
+[0;32mI (831) wifi_init: tcp tx win: 5744[0m
+[0;32mI (831) wifi_init: tcp rx win: 5744[0m
+[0;32mI (841) wifi_init: tcp mss: 1440[0m
+[0;32mI (841) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (851) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (851) phy_init: phy_version 4771,450c73b,Aug 16 2023,11:03:10[0m
+[0;32mI (771) lvgl_helpers: Initializing shared SPI master[0m
+[0;32mI (861) lvgl_helpers: Configuring SPI host VSPI_HOST (2)[0m
+[0;32mI (871) lvgl_helpers: MISO pin: 19, MOSI pin: 23, SCLK pin: 18, IO2/WP pin: -1, IO3/HD pin: -1[0m
+[0;32mI (881) lvgl_helpers: Max transfer size: 25600 (bytes)[0m
+[0;32mI (891) lvgl_helpers: Initializing SPI bus...[0m
+[0;32mI (891) disp_spi: Adding SPI device[0m
+[0;32mI (891) disp_spi: Clock speed: 40000000Hz, mode: 0, CS pin: 0[0m
+[0;32mI (911) gpio: GPIO[16]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (911) gpio: GPIO[4]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+I (941) wifi:mode : sta (0c:8b:95:4c:66:28)
+I (941) wifi:enable tsf
+[0;32mI (941) example_connect: Connecting to ZICER-guest...[0m
+[0;32mI (941) example_connect: Waiting for IP(s)[0m
+[0;32mI (1151) ILI9341: Initialization.[0m
+[0;32mI (1371) ILI9341: Display orientation: LANDSCAPE_INVERTED[0m
+[0;32mI (1371) ILI9341: 0x36 command value: 0xE8[0m
+[0;32mI (1371) XPT2046: XPT2046 Initialization[0m
+I (3361) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
+I (4461) wifi:state: init -> auth (b0)
+I (4461) wifi:state: auth -> assoc (0)
+I (4461) wifi:state: assoc -> run (10)
+I (4481) wifi:connected with ZICER-guest, aid = 6, channel 1, BW20, bssid = 20:a6:cd:d2:53:20
+I (4481) wifi:security: WPA2-PSK, phy: bgn, rssi: -71
+I (4481) wifi:pm start, type: 1
+
+I (4491) wifi:<ba-add>idx:0 (ifx:0, 20:a6:cd:d2:53:20), tid:0, ssn:2, winSize:64
+I (4521) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[0;32mI (5491) esp_netif_handlers: example_netif_sta ip: 192.168.254.5, mask: 255.255.254.0, gw: 192.168.255.254[0m
+[0;32mI (5491) example_connect: Got IPv4 event: Interface "example_netif_sta" address: 192.168.254.5[0m
+[0;32mI (5741) example_connect: Got IPv6 event: Interface "example_netif_sta" address: fe80:0000:0000:0000:0e8b:95ff:fe4c:6628, type: ESP_IP6_ADDR_IS_LINK_LOCAL[0m
+[0;32mI (5741) example_common: Connected to example_netif_sta[0m
+[0;32mI (5751) example_common: - IPv4 address: 192.168.254.5,[0m
+[0;32mI (5751) example_common: - IPv6 address: fe80:0000:0000:0000:0e8b:95ff:fe4c:6628, type: ESP_IP6_ADDR_IS_LINK_LOCAL[0m
+[0;32mI (5771) main_task: Returned from app_main()[0m
+[0;32mI (5771) MY_MQTT: Other event id:7[0m
+[0;32mI (5981) MY_MQTT: MQTT_EVENT_CONNECTED[0m
+[0;32mI (16231) XPT2046: P(10120,14808)[0m
+[0;32mI (16231) XPT2046: P_norm(632,925)[0m
+[0;32mI (16231) XPT2046: x = 84, y = 107[0m
+[0;32mI (16321) XPT2046: P(9840,15048)[0m
+[0;32mI (16321) XPT2046: P_norm(615,940)[0m
+[0;32mI (16321) XPT2046: x = 82, y = 108[0m
+[0;32mI (16421) XPT2046: P(32760,0)[0m
+[0;32mI (16421) XPT2046: P_norm(2047,0)[0m
+[0;32mI (16421) XPT2046: x = 165, y = 72[0m
+[0;32mI (18111) XPT2046: P(21792,14808)[0m
+[0;32mI (18111) XPT2046: P_norm(1362,925)[0m
+[0;32mI (18111) XPT2046: x = 211, y = 107[0m
+[0;32mI (18201) XPT2046: P(21880,14808)[0m
+[0;32mI (18201) XPT2046: P_norm(1367,925)[0m
+[0;32mI (18201) XPT2046: x = 211, y = 107[0m
+[0;32mI (18291) XPT2046: P(21848,0)[0m
+[0;32mI (18291) XPT2046: P_norm(1365,0)[0m
+[0;32mI (18291) XPT2046: x = 211, y = 71[0m
+[0;32mI (19091) XPT2046: P(23896,14920)[0m
+[0;32mI (19091) XPT2046: P_norm(1493,932)[0m
+[0;32mI (19091) XPT2046: x = 234, y = 108[0m
+[0;32mI (19181) XPT2046: P(23864,15192)[0m
+[0;32mI (19181) XPT2046: P_norm(1491,949)[0m
+[0;32mI (19181) XPT2046: x = 234, y = 109[0m
+[0;32mI (20101) XPT2046: P(6760,16584)[0m
+[0;32mI (20101) XPT2046: P_norm(422,1036)[0m
+[0;32mI (20101) XPT2046: x = 47, y = 122[0m
+[0;32mI (20221) XPT2046: P(6736,15992)[0m
+[0;32mI (20221) XPT2046: P_norm(421,999)[0m
+[0;32mI (20221) XPT2046: x = 47, y = 119[0m
+me first
+[0;32mI (23881) XPT2046: P(18512,16984)[0m
+[0;32mI (23881) XPT2046: P_norm(1157,1061)[0m
+[0;32mI (23881) XPT2046: x = 176, y = 125[0m
+[0;32mI (24091) XPT2046: P(18336,0)[0m
+[0;32mI (24091) XPT2046: P_norm(1146,0)[0m
+[0;32mI (24091) XPT2046: x = 175, y = 62[0m
+[0;32mI (24191) GUI_APP: 1 was pressed
+[0m
+[0;32mI (25921) XPT2046: P(17096,6216)[0m
+[0;32mI (25921) XPT2046: P_norm(1068,388)[0m
+[0;32mI (25921) XPT2046: x = 160, y = 38[0m
+[0;32mI (26131) XPT2046: P(16576,6384)[0m
+[0;32mI (26131) XPT2046: P_norm(1036,399)[0m
+[0;32mI (26131) XPT2046: x = 157, y = 38[0m
+[0;32mI (26201) GUI_APP: 1 was pressed
+[0m
+[0;32mI (27871) XPT2046: P(7008,16080)[0m
+[0;32mI (27871) XPT2046: P_norm(438,1005)[0m
+[0;32mI (27871) XPT2046: x = 50, y = 118[0m
+[0;32mI (28091) XPT2046: P(6672,0)[0m
+[0;32mI (28091) XPT2046: P_norm(417,0)[0m
+[0;32mI (28091) XPT2046: x = 48, y = 59[0m
+[0;32mI (28181) GUI_APP: 0 was pressed
+[0m
+[0;32mI (28741) XPT2046: P(9000,28056)[0m
+[0;32mI (28741) XPT2046: P_norm(562,1753)[0m
+[0;32mI (28741) XPT2046: x = 72, y = 214[0m
+[0;32mI (28951) XPT2046: P(8856,28568)[0m
+[0;32mI (28951) XPT2046: P_norm(553,1785)[0m
+[0;32mI (28951) XPT2046: x = 71, y = 216[0m
+[0;32mI (29011) GUI_APP: 6 was pressed
+[0m
+[0;32mI (29641) XPT2046: P(28416,24784)[0m
+[0;32mI (29641) XPT2046: P_norm(1776,1549)[0m
+[0;32mI (29641) XPT2046: x = 284, y = 188[0m
+[0;32mI (29811) GUI_APP: 8 was pressed
+[0m
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6992
+load:0x40078000,len:15512
+load:0x40080400,len:3864
+entry 0x40080650
+[0;32mI (27) boot: ESP-IDF v5.0.4-dirty 2nd stage bootloader[0m
+[0;32mI (27) boot: compile time 21:02:31[0m
+[0;32mI (27) boot: Multicore bootloader[0m
+[0;32mI (31) boot: chip revision: v3.0[0m
+[0;32mI (35) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (40) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (44) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (49) boot: Enabling RNG early entropy source...[0m
+[0;32mI (54) boot: Partition Table:[0m
+[0;32mI (58) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (65) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (72) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (80) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (87) boot: End of partition table[0m
+[0;32mI (91) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=3cd74h (249204) map[0m
+[0;32mI (190) esp_image: segment 1: paddr=0004cd9c vaddr=3ffb0000 size=0327ch ( 12924) load[0m
+[0;32mI (195) esp_image: segment 2: paddr=00050020 vaddr=400d0020 size=ccb3ch (838460) map[0m
+[0;32mI (499) esp_image: segment 3: paddr=0011cb64 vaddr=3ffb327c size=00454h (  1108) load[0m
+[0;32mI (499) esp_image: segment 4: paddr=0011cfc0 vaddr=40080000 size=18274h ( 98932) load[0m
+[0;32mI (557) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (557) boot: Disabling RNG early entropy source...[0m
+[0;32mI (569) cpu_start: Multicore app[0m
+[0;32mI (569) cpu_start: Pro cpu up.[0m
+[0;32mI (569) cpu_start: Starting app cpu, entry point is 0x400814d0[0m
+[0;32mI (0) cpu_start: App cpu up.[0m
+[0;32mI (589) cpu_start: Pro cpu start user code[0m
+[0;32mI (589) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (589) cpu_start: Application information:[0m
+[0;32mI (594) cpu_start: Project name:     esp32_gui[0m
+[0;32mI (599) cpu_start: App version:      b36ffd7-dirty[0m
+[0;32mI (604) cpu_start: Compile time:     Apr 13 2024 21:02:24[0m
+[0;32mI (610) cpu_start: ELF file SHA256:  b4803917e8414283...[0m
+[0;32mI (616) cpu_start: ESP-IDF:          v5.0.4-dirty[0m
+[0;32mI (622) cpu_start: Min chip rev:     v0.0[0m
+[0;32mI (626) cpu_start: Max chip rev:     v3.99 [0m
+[0;32mI (631) cpu_start: Chip rev:         v3.0[0m
+[0;32mI (636) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (643) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (649) heap_init: At 3FFC3ED0 len 0001C130 (112 KiB): DRAM[0m
+[0;32mI (656) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (662) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (668) heap_init: At 40098274 len 00007D8C (31 KiB): IRAM[0m
+[0;32mI (676) spi_flash: detected chip: generic[0m
+[0;32mI (679) spi_flash: flash io: dio[0m
+[0;33mW (683) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (697) app_start: Starting scheduler on CPU0[0m
+[0;32m[0;32mI (701) app_start: Starting scheduler on CPU1[0m
+I (701) main_task: Started on CPU0[0m
+[0;32mI (711) main_task: Calling app_main()[0m
+[0;32mI (711) MY_MQTT: [APP] Startup..[0m
+[0;32mI (711) MY_MQTT: [APP] Free memory: 218052 bytes[0m
+[0;32mI (721) MY_MQTT: [APP] IDF version: v5.0.4-dirty[0m
+[0;32mI (731) lvgl_helpers: Display hor size: 320, ver size: 240[0m
+[0;32mI (741) example_connect: Start example_connect.[0m
+I (761) wifi:wifi driver task: 3ffce8dc, prio:23, stack:6656, core=0
+[0;32mI (761) system_api: Base MAC address is not set[0m
+[0;32mI (761) system_api: read default base MAC address from EFUSE[0m
+[0;32mI (741) lvgl_helpers: Display buffer size: 12800[0m
+I (771) wifi:wifi firmware version: e2d0ad8
+I (771) wifi:wifi certification version: v7.0
+I (781) wifi:config NVS flash: enabled
+I (781) wifi:config nano formating: disabled
+I (791) wifi:Init data frame dynamic rx buffer num: 32
+I (791) wifi:Init management frame dynamic rx buffer num: 32
+I (801) wifi:Init management short buffer num: 32
+I (801) wifi:Init dynamic tx buffer num: 32
+I (801) wifi:Init static rx buffer size: 1600
+I (811) wifi:Init static rx buffer num: 10
+I (811) wifi:Init dynamic rx buffer num: 32
+[0;32mI (821) wifi_init: rx ba win: 6[0m
+[0;32mI (821) wifi_init: tcpip mbox: 32[0m
+[0;32mI (821) wifi_init: udp mbox: 6[0m
+[0;32mI (831) wifi_init: tcp mbox: 6[0m
+[0;32mI (831) wifi_init: tcp tx win: 5744[0m
+[0;32mI (831) wifi_init: tcp rx win: 5744[0m
+[0;32mI (841) wifi_init: tcp mss: 1440[0m
+[0;32mI (841) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (851) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (851) phy_init: phy_version 4771,450c73b,Aug 16 2023,11:03:10[0m
+[0;32mI (771) lvgl_helpers: Initializing shared SPI master[0m
+[0;32mI (861) lvgl_helpers: Configuring SPI host VSPI_HOST (2)[0m
+[0;32mI (871) lvgl_helpers: MISO pin: 19, MOSI pin: 23, SCLK pin: 18, IO2/WP pin: -1, IO3/HD pin: -1[0m
+[0;32mI (881) lvgl_helpers: Max transfer size: 25600 (bytes)[0m
+[0;32mI (891) lvgl_helpers: Initializing SPI bus...[0m
+[0;32mI (891) disp_spi: Adding SPI device[0m
+[0;32mI (891) disp_spi: Clock speed: 40000000Hz, mode: 0, CS pin: 0[0m
+[0;32mI (911) gpio: GPIO[16]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (911) gpio: GPIO[4]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+I (941) wifi:mode : sta (0c:8b:95:4c:66:28)
+I (941) wifi:enable tsf
+[0;32mI (941) example_connect: Connecting to ZICER-guest...[0m
+[0;32mI (941) example_connect: Waiting for IP(s)[0m
+[0;32mI (1151) ILI9341: Initialization.[0m
+[0;32mI (1371) ILI9341: Display orientation: LANDSCAPE_INVERTED[0m
+[0;32mI (1371) ILI9341: 0x36 command value: 0xE8[0m
+[0;32mI (1371) XPT2046: XPT2046 Initialization[0m
+I (3361) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
+I (4461) wifi:state: init -> auth (b0)
+I (4461) wifi:state: auth -> assoc (0)
+I (4461) wifi:state: assoc -> run (10)
+I (4491) wifi:connected with ZICER-guest, aid = 6, channel 1, BW20, bssid = 20:a6:cd:d2:53:20
+I (4491) wifi:security: WPA2-PSK, phy: bgn, rssi: -78
+I (4491) wifi:pm start, type: 1
+
+I (4511) wifi:<ba-add>idx:0 (ifx:0, 20:a6:cd:d2:53:20), tid:0, ssn:2, winSize:64
+I (4541) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[0;32mI (5741) example_connect: Got IPv6 event: Interface "example_netif_sta" address: fe80:0000:0000:0000:0e8b:95ff:fe4c:6628, type: ESP_IP6_ADDR_IS_LINK_LOCAL[0m
+[0;32mI (6501) esp_netif_handlers: example_netif_sta ip: 192.168.254.5, mask: 255.255.254.0, gw: 192.168.255.254[0m
+[0;32mI (6501) example_connect: Got IPv4 event: Interface "example_netif_sta" address: 192.168.254.5[0m
+[0;32mI (6511) example_common: Connected to example_netif_sta[0m
+[0;32mI (6511) example_common: - IPv4 address: 192.168.254.5,[0m
+[0;32mI (6521) example_common: - IPv6 address: fe80:0000:0000:0000:0e8b:95ff:fe4c:6628, type: ESP_IP6_ADDR_IS_LINK_LOCAL[0m
+[0;32mI (6531) main_task: Returned from app_main()[0m
+[0;32mI (6531) MY_MQTT: Other event id:7[0m
+[0;32mI (7781) MY_MQTT: MQTT_EVENT_CONNECTED[0m
+[0;32mI (1343131) XPT2046: P(9792,15784)[0m
+[0;32mI (1343131) XPT2046: P_norm(612,986)[0m
+[0;32mI (1343131) XPT2046: x = 80, y = 115[0m
+[0;32mI (1343251) XPT2046: P(32760,0)[0m
+[0;32mI (1343251) XPT2046: P_norm(2047,0)[0m
+[0;32mI (1343251) XPT2046: x = 205, y = 57[0m
+me first
+[0;32mI (1348971) XPT2046: P(9264,22504)[0m
+[0;32mI (1348971) XPT2046: P_norm(579,1406)[0m
+[0;32mI (1348971) XPT2046: x = 75, y = 169[0m
+[0;32mI (1349151) GUI_APP: 6 was pressed
+[0m
+[0;32mI (1350391) XPT2046: P(15096,17472)[0m
+[0;32mI (1350391) XPT2046: P_norm(943,1092)[0m
+[0;32mI (1350391) XPT2046: x = 138, y = 129[0m
+[0;32mI (1350561) GUI_APP: 4 was pressed
+[0m
+[0;32mI (1351061) XPT2046: P(18192,27000)[0m
+[0;32mI (1351061) XPT2046: P_norm(1137,1687)[0m
+[0;32mI (1351061) XPT2046: x = 172, y = 206[0m
+[0;32mI (1351221) GUI_APP: 7 was pressed
+[0m
+[0;32mI (1351551) XPT2046: P(19208,8088)[0m
+[0;32mI (1351551) XPT2046: P_norm(1200,505)[0m
+[0;32mI (1351551) XPT2046: x = 183, y = 53[0m
+[0;32mI (1351721) GUI_APP: 1 was pressed
+[0m
+[0;32mI (2265801) XPT2046: P(15960,16840)[0m
+[0;32mI (2265801) XPT2046: P_norm(997,1052)[0m
+[0;32mI (2265801) XPT2046: x = 148, y = 124[0m
+[0;32mI (2265981) GUI_APP: 4 was pressed
+[0m
+[0;32mI (2266541) XPT2046: P(16600,25664)[0m
+[0;32mI (2266541) XPT2046: P_norm(1037,1604)[0m
+[0;32mI (2266541) XPT2046: x = 155, y = 195[0m
+[0;32mI (2266711) GUI_APP: 7 was pressed
+[0m
+[0;32mI (2267151) XPT2046: P(7544,26072)[0m
+[0;32mI (2267151) XPT2046: P_norm(471,1629)[0m
+[0;32mI (2267151) XPT2046: x = 56, y = 198[0m
+[0;32mI (2267321) GUI_APP: 6 was pressed
+[0m
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6992
+load:0x40078000,len:15512
+load:0x40080400,len:3864
+entry 0x40080650
+[0;32mI (27) boot: ESP-IDF v5.0.4-dirty 2nd stage bootloader[0m
+[0;32mI (27) boot: compile time 21:02:31[0m
+[0;32mI (27) boot: Multicore bootloader[0m
+[0;32mI (31) boot: chip revision: v3.0[0m
+[0;32mI (35) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (40) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (44) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (49) boot: Enabling RNG early entropy source...[0m
+[0;32mI (54) boot: Partition Table:[0m
+[0;32mI (58) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (65) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (72) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (80) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (87) boot: End of partition table[0m
+[0;32mI (91) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=3cd74h (249204) map[0m
+[0;32mI (190) esp_image: segment 1: paddr=0004cd9c vaddr=3ffb0000 size=0327ch ( 12924) load[0m
+[0;32mI (195) esp_image: segment 2: paddr=00050020 vaddr=400d0020 size=ccb3ch (838460) map[0m
+[0;32mI (499) esp_image: segment 3: paddr=0011cb64 vaddr=3ffb327c size=00454h (  1108) load[0m
+[0;32mI (499) esp_image: segment 4: paddr=0011cfc0 vaddr=40080000 size=18274h ( 98932) load[0m
+[0;32mI (557) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (557) boot: Disabling RNG early entropy source...[0m
+[0;32mI (569) cpu_start: Multicore app[0m
+[0;32mI (569) cpu_start: Pro cpu up.[0m
+[0;32mI (569) cpu_start: Starting app cpu, entry point is 0x400814d0[0m
+[0;32mI (0) cpu_start: App cpu up.[0m
+[0;32mI (589) cpu_start: Pro cpu start user code[0m
+[0;32mI (589) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (589) cpu_start: Application information:[0m
+[0;32mI (594) cpu_start: Project name:     esp32_gui[0m
+[0;32mI (599) cpu_start: App version:      b36ffd7-dirty[0m
+[0;32mI (604) cpu_start: Compile time:     Apr 13 2024 21:02:24[0m
+[0;32mI (610) cpu_start: ELF file SHA256:  b4803917e8414283...[0m
+[0;32mI (616) cpu_start: ESP-IDF:          v5.0.4-dirty[0m
+[0;32mI (622) cpu_start: Min chip rev:     v0.0[0m
+[0;32mI (626) cpu_start: Max chip rev:     v3.99 [0m
+[0;32mI (631) cpu_start: Chip rev:         v3.0[0m
+[0;32mI (636) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (643) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (649) heap_init: At 3FFC3ED0 len 0001C130 (112 KiB): DRAM[0m
+[0;32mI (656) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (662) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (668) heap_init: At 40098274 len 00007D8C (31 KiB): IRAM[0m
+[0;32mI (676) spi_flash: detected chip: generic[0m
+[0;32mI (679) spi_flash: flash io: dio[0m
+[0;33mW (683) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (697) app_start: Starting scheduler on CPU0[0m
+[0;32m[0;32mI (701) app_start: Starting scheduler on CPU1[0m
+I (701) main_task: Started on CPU0[0m
+[0;32mI (711) main_task: Calling app_main()[0m
+[0;32mI (711) MY_MQTT: [APP] Startup..[0m
+[0;32mI (711) MY_MQTT: [APP] Free memory: 218052 bytes[0m
+[0;32mI (721) MY_MQTT: [APP] IDF version: v5.0.4-dirty[0m
+[0;32mI (731) lvgl_helpers: Display hor size: 320, ver size: 240[0m
+[0;32mI (741) example_connect: Start example_connect.[0m
+I (761) wifi:wifi driver task: 3ffce8dc, prio:23, stack:6656, core=0
+[0;32mI (761) system_api: Base MAC address is not set[0m
+[0;32mI (761) system_api: read default base MAC address from EFUSE[0m
+[0;32mI (741) lvgl_helpers: Display buffer size: 12800[0m
+I (771) wifi:wifi firmware version: e2d0ad8
+I (771) wifi:wifi certification version: v7.0
+I (781) wifi:config NVS flash: enabled
+I (781) wifi:config nano formating: disabled
+I (791) wifi:Init data frame dynamic rx buffer num: 32
+I (791) wifi:Init management frame dynamic rx buffer num: 32
+I (801) wifi:Init management short buffer num: 32
+I (801) wifi:Init dynamic tx buffer num: 32
+I (801) wifi:Init static rx buffer size: 1600
+I (811) wifi:Init static rx buffer num: 10
+I (811) wifi:Init dynamic rx buffer num: 32
+[0;32mI (821) wifi_init: rx ba win: 6[0m
+[0;32mI (821) wifi_init: tcpip mbox: 32[0m
+[0;32mI (821) wifi_init: udp mbox: 6[0m
+[0;32mI (831) wifi_init: tcp mbox: 6[0m
+[0;32mI (831) wifi_init: tcp tx win: 5744[0m
+[0;32mI (831) wifi_init: tcp rx win: 5744[0m
+[0;32mI (841) wifi_init: tcp mss: 1440[0m
+[0;32mI (841) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (851) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (851) phy_init: phy_version 4771,450c73b,Aug 16 2023,11:03:10[0m
+[0;32mI (771) lvgl_helpers: Initializing shared SPI master[0m
+[0;32mI (861) lvgl_helpers: Configuring SPI host VSPI_HOST (2)[0m
+[0;32mI (871) lvgl_helpers: MISO pin: 19, MOSI pin: 23, SCLK pin: 18, IO2/WP pin: -1, IO3/HD pin: -1[0m
+[0;32mI (881) lvgl_helpers: Max transfer size: 25600 (bytes)[0m
+[0;32mI (891) lvgl_helpers: Initializing SPI bus...[0m
+[0;32mI (891) disp_spi: Adding SPI device[0m
+[0;32mI (891) disp_spi: Clock speed: 40000000Hz, mode: 0, CS pin: 0[0m
+[0;32mI (911) gpio: GPIO[16]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (911) gpio: GPIO[4]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+I (941) wifi:mode : sta (0c:8b:95:4c:66:28)
+I (941) wifi:enable tsf
+[0;32mI (941) example_connect: Connecting to ZICER-guest...[0m
+[0;32mI (941) example_connect: Waiting for IP(s)[0m
+[0;32mI (1151) ILI9341: Initialization.[0m
+[0;32mI (1371) ILI9341: Display orientation: LANDSCAPE_INVERTED[0m
+[0;32mI (1371) ILI9341: 0x36 command value: 0xE8[0m
+[0;32mI (1371) XPT2046: XPT2046 Initialization[0m
+I (3351) wifi:new:<6,0>, old:<1,0>, ap:<255,255>, sta:<6,0>, prof:1
+I (4461) wifi:state: init -> auth (b0)
+I (4461) wifi:state: auth -> assoc (0)
+I (4471) wifi:state: assoc -> run (10)
+I (4491) wifi:connected with ZICER-guest, aid = 2, channel 6, BW20, bssid = 20:a6:cd:d2:51:40
+I (4491) wifi:security: WPA2-PSK, phy: bgn, rssi: -80
+I (4491) wifi:pm start, type: 1
+
+I (4511) wifi:<ba-add>idx:0 (ifx:0, 20:a6:cd:d2:51:40), tid:0, ssn:2, winSize:64
+I (4551) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[0;32mI (5741) example_connect: Got IPv6 event: Interface "example_netif_sta" address: fe80:0000:0000:0000:0e8b:95ff:fe4c:6628, type: ESP_IP6_ADDR_IS_LINK_LOCAL[0m
+[0;32mI (6491) esp_netif_handlers: example_netif_sta ip: 192.168.254.5, mask: 255.255.254.0, gw: 192.168.255.254[0m
+[0;32mI (6491) example_connect: Got IPv4 event: Interface "example_netif_sta" address: 192.168.254.5[0m
+[0;32mI (6501) example_common: Connected to example_netif_sta[0m
+[0;32mI (6501) example_common: - IPv4 address: 192.168.254.5,[0m
+[0;32mI (6511) example_common: - IPv6 address: fe80:0000:0000:0000:0e8b:95ff:fe4c:6628, type: ESP_IP6_ADDR_IS_LINK_LOCAL[0m
+[0;32mI (6521) main_task: Returned from app_main()[0m
+[0;32mI (6521) MY_MQTT: Other event id:7[0m
+W (6711) wifi:ba not setup
+[0;32mI (6761) MY_MQTT: MQTT_EVENT_CONNECTED[0m
+[0;32mI (8611) XPT2046: P(32760,0)[0m
+[0;32mI (8611) XPT2046: P_norm(2047,0)[0m
+[0;32mI (8611) XPT2046: x = 331, y = 0[0m
+[0;32mI (9701) XPT2046: P(22448,16360)[0m
+[0;32mI (9701) XPT2046: P_norm(1403,1022)[0m
+[0;32mI (9701) XPT2046: x = 219, y = 120[0m
+[0;32mI (9801) XPT2046: P(22296,15480)[0m
+[0;32mI (9801) XPT2046: P_norm(1393,967)[0m
+[0;32mI (9801) XPT2046: x = 218, y = 116[0m
+earthling first
+[0;32mI (19601) XPT2046: P(16064,16952)[0m
+[0;32mI (19601) XPT2046: P_norm(1004,1059)[0m
+[0;32mI (19601) XPT2046: x = 149, y = 125[0m
+[0;32mI (19771) GUI_APP: 4 was pressed
+[0m
+[0;32mI (20401) XPT2046: P(15024,26104)[0m
+[0;32mI (20401) XPT2046: P_norm(939,1631)[0m
+[0;32mI (20401) XPT2046: x = 137, y = 198[0m
+[0;32mI (20611) XPT2046: P(15000,25736)[0m
+[0;32mI (20611) XPT2046: P_norm(937,1608)[0m
+[0;32mI (20611) XPT2046: x = 137, y = 196[0m
+[0;32mI (20671) GUI_APP: 7 was pressed
+[0m
+[0;32mI (21161) XPT2046: P(6024,28072)[0m
+[0;32mI (21161) XPT2046: P_norm(376,1754)[0m
+[0;32mI (21161) XPT2046: x = 39, y = 214[0m
+[0;32mI (21371) XPT2046: P(5712,0)[0m
+[0;32mI (21371) XPT2046: P_norm(357,0)[0m
+[0;32mI (21371) XPT2046: x = 37, y = 107[0m
+[0;32mI (21471) GUI_APP: 3 was pressed
+[0m
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6992
+load:0x40078000,len:15512
+load:0x40080400,len:3864
+entry 0x40080650
+[0;32mI (27) boot: ESP-IDF v5.0.4-dirty 2nd stage bootloader[0m
+[0;32mI (27) boot: compile time 21:02:31[0m
+[0;32mI (27) boot: Multicore bootloader[0m
+[0;32mI (31) boot: chip revision: v3.0[0m
+[0;32mI (35) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (40) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (44) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (49) boot: Enabling RNG early entropy source...[0m
+[0;32mI (54) boot: Partition Table:[0m
+[0;32mI (58) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (65) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (72) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (80) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (87) boot: End of partition table[0m
+[0;32mI (91) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=3cd74h (249204) map[0m
+[0;32mI (190) esp_image: segment 1: paddr=0004cd9c vaddr=3ffb0000 size=0327ch ( 12924) load[0m
+[0;32mI (195) esp_image: segment 2: paddr=00050020 vaddr=400d0020 size=ccb3ch (838460) map[0m
+[0;32mI (499) esp_image: segment 3: paddr=0011cb64 vaddr=3ffb327c size=00454h (  1108) load[0m
+[0;32mI (499) esp_image: segment 4: paddr=0011cfc0 vaddr=40080000 size=18274h ( 98932) load[0m
+[0;32mI (557) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (557) boot: Disabling RNG early entropy source...[0m
+[0;32mI (569) cpu_start: Multicore app[0m
+[0;32mI (569) cpu_start: Pro cpu up.[0m
+[0;32mI (569) cpu_start: Starting app cpu, entry point is 0x400814d0[0m
+[0;32mI (0) cpu_start: App cpu up.[0m
+[0;32mI (589) cpu_start: Pro cpu start user code[0m
+[0;32mI (589) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (589) cpu_start: Application information:[0m
+[0;32mI (594) cpu_start: Project name:     esp32_gui[0m
+[0;32mI (599) cpu_start: App version:      b36ffd7-dirty[0m
+[0;32mI (604) cpu_start: Compile time:     Apr 13 2024 21:02:24[0m
+[0;32mI (610) cpu_start: ELF file SHA256:  b4803917e8414283...[0m
+[0;32mI (616) cpu_start: ESP-IDF:          v5.0.4-dirty[0m
+[0;32mI (622) cpu_start: Min chip rev:     v0.0[0m
+[0;32mI (626) cpu_start: Max chip rev:     v3.99 [0m
+[0;32mI (631) cpu_start: Chip rev:         v3.0[0m
+[0;32mI (636) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (643) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (649) heap_init: At 3FFC3ED0 len 0001C130 (112 KiB): DRAM[0m
+[0;32mI (656) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (662) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (668) heap_init: At 40098274 len 00007D8C (31 KiB): IRAM[0m
+[0;32mI (676) spi_flash: detected chip: generic[0m
+[0;32mI (679) spi_flash: flash io: dio[0m
+[0;33mW (683) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (697) app_start: Starting scheduler on CPU0[0m
+[0;32m[0;32mI (701) app_start: Starting scheduler on CPU1[0m
+I (701) main_task: Started on CPU0[0m
+[0;32mI (711) main_task: Calling app_main()[0m
+[0;32mI (711) MY_MQTT: [APP] Startup..[0m
+[0;32mI (711) MY_MQTT: [APP] Free memory: 218052 bytes[0m
+[0;32mI (721) MY_MQTT: [APP] IDF version: v5.0.4-dirty[0m
+[0;32mI (731) lvgl_helpers: Display hor size: 320, ver size: 240[0m
+[0;32mI (741) example_connect: Start example_connect.[0m
+I (761) wifi:wifi driver task: 3ffce8dc, prio:23, stack:6656, core=0
+[0;32mI (761) system_api: Base MAC address is not set[0m
+[0;32mI (761) system_api: read default base MAC address from EFUSE[0m
+[0;32mI (741) lvgl_helpers: Display buffer size: 12800[0m
+I (771) wifi:wifi firmware version: e2d0ad8
+I (771) wifi:wifi certification version: v7.0
+I (781) wifi:config NVS flash: enabled
+I (781) wifi:config nano formating: disabled
+I (791) wifi:Init data frame dynamic rx buffer num: 32
+I (791) wifi:Init management frame dynamic rx buffer num: 32
+I (801) wifi:Init management short buffer num: 32
+I (801) wifi:Init dynamic tx buffer num: 32
+I (801) wifi:Init static rx buffer size: 1600
+I (811) wifi:Init static rx buffer num: 10
+I (811) wifi:Init dynamic rx buffer num: 32
+[0;32mI (821) wifi_init: rx ba win: 6[0m
+[0;32mI (821) wifi_init: tcpip mbox: 32[0m
+[0;32mI (821) wifi_init: udp mbox: 6[0m
+[0;32mI (831) wifi_init: tcp mbox: 6[0m
+[0;32mI (831) wifi_init: tcp tx win: 5744[0m
+[0;32mI (831) wifi_init: tcp rx win: 5744[0m
+[0;32mI (841) wifi_init: tcp mss: 1440[0m
+[0;32mI (841) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (851) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (851) phy_init: phy_version 4771,450c73b,Aug 16 2023,11:03:10[0m
+[0;32mI (771) lvgl_helpers: Initializing shared SPI master[0m
+[0;32mI (861) lvgl_helpers: Configuring SPI host VSPI_HOST (2)[0m
+[0;32mI (871) lvgl_helpers: MISO pin: 19, MOSI pin: 23, SCLK pin: 18, IO2/WP pin: -1, IO3/HD pin: -1[0m
+[0;32mI (881) lvgl_helpers: Max transfer size: 25600 (bytes)[0m
+[0;32mI (891) lvgl_helpers: Initializing SPI bus...[0m
+[0;32mI (891) disp_spi: Adding SPI device[0m
+[0;32mI (891) disp_spi: Clock speed: 40000000Hz, mode: 0, CS pin: 0[0m
+[0;32mI (911) gpio: GPIO[16]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (911) gpio: GPIO[4]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+I (941) wifi:mode : sta (0c:8b:95:4c:66:28)
+I (941) wifi:enable tsf
+[0;32mI (941) example_connect: Connecting to ZICER-guest...[0m
+[0;32mI (941) example_connect: Waiting for IP(s)[0m
+[0;32mI (1151) ILI9341: Initialization.[0m
+[0;32mI (1371) ILI9341: Display orientation: LANDSCAPE_INVERTED[0m
+[0;32mI (1371) ILI9341: 0x36 command value: 0xE8[0m
+[0;32mI (1371) XPT2046: XPT2046 Initialization[0m
+I (3361) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
+I (4461) wifi:state: init -> auth (b0)
+I (4461) wifi:state: auth -> assoc (0)
+I (4471) wifi:state: assoc -> run (10)
+I (4681) wifi:connected with ZICER-guest, aid = 4, channel 1, BW20, bssid = 20:a6:cd:d2:53:20
+I (4681) wifi:security: WPA2-PSK, phy: bgn, rssi: -78
+I (4681) wifi:pm start, type: 1
+
+I (4691) wifi:<ba-add>idx:0 (ifx:0, 20:a6:cd:d2:53:20), tid:0, ssn:2, winSize:64
+I (4761) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+[0;32mI (5421) XPT2046: P(25464,20552)[0m
+[0;32mI (5421) XPT2046: P_norm(1591,1284)[0m
+[0;32mI (5421) XPT2046: x = 251, y = 154[0m
+[0;32mI (5521) XPT2046: P(25304,20728)[0m
+[0;32mI (5521) XPT2046: P_norm(1581,1295)[0m
+[0;32mI (5521) XPT2046: x = 250, y = 154[0m
+[0;32mI (5681) esp_netif_handlers: example_netif_sta ip: 192.168.254.5, mask: 255.255.254.0, gw: 192.168.255.254[0m
+[0;32mI (5681) example_connect: Got IPv4 event: Interface "example_netif_sta" address: 192.168.254.5[0m
+[0;32mI (5741) example_connect: Got IPv6 event: Interface "example_netif_sta" address: fe80:0000:0000:0000:0e8b:95ff:fe4c:6628, type: ESP_IP6_ADDR_IS_LINK_LOCAL[0m
+[0;32mI (5741) example_common: Connected to example_netif_sta[0m
+[0;32mI (5751) example_common: - IPv4 address: 192.168.254.5,[0m
+[0;32mI (5751) example_common: - IPv6 address: fe80:0000:0000:0000:0e8b:95ff:fe4c:6628, type: ESP_IP6_ADDR_IS_LINK_LOCAL[0m
+[0;32mI (5771) main_task: Returned from app_main()[0m
+[0;32mI (5771) MY_MQTT: Other event id:7[0m
+[0;32mI (5851) MY_MQTT: MQTT_EVENT_CONNECTED[0m
+[0;32mI (6271) XPT2046: P(24736,18600)[0m
+[0;32mI (6271) XPT2046: P_norm(1546,1162)[0m
+[0;32mI (6271) XPT2046: x = 244, y = 138[0m
+[0;32mI (6391) XPT2046: P(24712,18192)[0m
+[0;32mI (6391) XPT2046: P_norm(1544,1137)[0m
+[0;32mI (6391) XPT2046: x = 243, y = 136[0m
+[0;32mI (6511) XPT2046: P(32760,0)[0m
+[0;32mI (6511) XPT2046: P_norm(2047,0)[0m
+[0;32mI (6511) XPT2046: x = 272, y = 91[0m
+earthling first
+[0;32mI (9721) XPT2046: P(7408,26496)[0m
+[0;32mI (9721) XPT2046: P_norm(463,1656)[0m
+[0;32mI (9721) XPT2046: x = 54, y = 202[0m
+[0;32mI (9941) XPT2046: P(7832,26784)[0m
+[0;32mI (9941) XPT2046: P_norm(489,1674)[0m
+[0;32mI (9941) XPT2046: x = 56, y = 203[0m
+[0;32mI (10001) GUI_APP: 6 was pressed
+[0m

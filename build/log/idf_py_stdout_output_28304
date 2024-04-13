@@ -1,0 +1,40 @@
+[1/9] Performing build step for 'bootloader'
+[1/1] cmd.exe /C "cd /D C:\Users\jovic\wes-hack\build\bootloader\esp-idf\esptool_py && C:\Espressif\python_env\idf5.0_py3.11_env\Scripts\python.exe C:/Espressif/frameworks/esp-idf-v5.0.4/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 C:/Users/jovic/wes-hack/build/bootloader/bootloader.bin"
+Bootloader binary size 0x6760 bytes. 0x8a0 bytes (8%) free.
+[2/7] Building C object esp-idf/my_mqtt/CMakeFiles/__idf_my_mqtt.dir/my_mqtt.c.obj
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c: In function 'mqtt5_event_handler':
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:161:10: warning: unused variable 'data' [-Wunused-variable]
+  161 |     char data[2500];
+      |          ^~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:160:10: warning: unused variable 'topic' [-Wunused-variable]
+  160 |     char topic[20];
+      |          ^~~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c: In function 'my_mqtt_task':
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:294:11: warning: unused variable 'msg' [-Wunused-variable]
+  294 |     char* msg;
+      |           ^~~
+In file included from C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:34:
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c: At top level:
+C:/Users/jovic/wes-hack/components/temp_hum_sensor/temp_hum_sensor.h:19:16: warning: 'sht31_crc' declared 'static' but never defined [-Wunused-function]
+   19 | static uint8_t sht31_crc(uint8_t *data);
+      |                ^~~~~~~~~
+C:/Users/jovic/wes-hack/components/temp_hum_sensor/temp_hum_sensor.h:20:18: warning: 'sht31_read_temp_humi' declared 'static' but never defined [-Wunused-function]
+   20 | static esp_err_t sht31_read_temp_humi(float *temp, float *humi);
+      |                  ^~~~~~~~~~~~~~~~~~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:48:13: warning: '_create_demo_application' declared 'static' but never defined [-Wunused-function]
+   48 | static void _create_demo_application(void);
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:92:14: warning: 'create_json_payload' defined but not used [-Wunused-function]
+   92 | static char* create_json_payload(void) {
+      |              ^~~~~~~~~~~~~~~~~~~
+[3/7] Linking C static library esp-idf\my_mqtt\libmy_mqtt.a
+[4/7] Generating ld/sections.ld
+[5/7] Linking CXX executable esp32_gui.elf
+[6/7] Generating binary image from built executable
+esptool.py v4.6.2
+Creating esp32 image...
+Merged 26 ELF sections
+Successfully created esp32 image.
+Generated C:/Users/jovic/wes-hack/build/esp32_gui.bin
+[7/7] cmd.exe /C "cd /D C:\Users\jovic\wes-hack\build\esp-idf\esptool_py && C:\Espressif\python_env\idf5.0_py3.11_env\Scripts\python.exe C:/Espressif/frameworks/esp-idf-v5.0.4/components/partition_table/check_sizes.py --offset 0x8000 partition --type app C:/Users/jovic/wes-hack/build/partition_table/partition-table.bin C:/Users/jovic/wes-hack/build/esp32_gui.bin"
+esp32_gui.bin binary size 0x12b7a0 bytes. Smallest app partition is 0x177000 bytes. 0x4b860 bytes (20%) free.

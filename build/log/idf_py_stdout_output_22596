@@ -1,0 +1,126 @@
+[1/10] Performing build step for 'bootloader'
+[1/1] cmd.exe /C "cd /D C:\Users\jovic\wes-hack\build\bootloader\esp-idf\esptool_py && C:\Espressif\python_env\idf5.0_py3.11_env\Scripts\python.exe C:/Espressif/frameworks/esp-idf-v5.0.4/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 C:/Users/jovic/wes-hack/build/bootloader/bootloader.bin"
+Bootloader binary size 0x6760 bytes. 0x8a0 bytes (8%) free.
+[2/8] Building C object esp-idf/my_mqtt/CMakeFiles/__idf_my_mqtt.dir/my_mqtt.c.obj
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c: In function 'mqtt5_event_handler':
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:166:10: warning: unused variable 'data' [-Wunused-variable]
+  166 |     char data[2500];
+      |          ^~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:165:10: warning: unused variable 'topic' [-Wunused-variable]
+  165 |     char topic[20];
+      |          ^~~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c: In function 'my_mqtt_task':
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:271:25: warning: unused variable 'tictactoe_msg' [-Wunused-variable]
+  271 |     tictactoe_handler_t tictactoe_msg;
+      |                         ^~~~~~~~~~~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:270:11: warning: unused variable 'msg' [-Wunused-variable]
+  270 |     char* msg;
+      |           ^~~
+In file included from C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:34:
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c: At top level:
+C:/Users/jovic/wes-hack/components/temp_hum_sensor/temp_hum_sensor.h:19:16: warning: 'sht31_crc' declared 'static' but never defined [-Wunused-function]
+   19 | static uint8_t sht31_crc(uint8_t *data);
+      |                ^~~~~~~~~
+C:/Users/jovic/wes-hack/components/temp_hum_sensor/temp_hum_sensor.h:20:18: warning: 'sht31_read_temp_humi' declared 'static' but never defined [-Wunused-function]
+   20 | static esp_err_t sht31_read_temp_humi(float *temp, float *humi);
+      |                  ^~~~~~~~~~~~~~~~~~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:47:13: warning: '_create_demo_application' declared 'static' but never defined [-Wunused-function]
+   47 | static void _create_demo_application(void);
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:269:13: warning: 'my_mqtt_task' defined but not used [-Wunused-function]
+  269 | static void my_mqtt_task(void *pvParameters) {
+      |             ^~~~~~~~~~~~
+C:/Users/jovic/wes-hack/components/my_mqtt/my_mqtt.c:130:14: warning: 'create_json_payload_game' defined but not used [-Wunused-function]
+  130 | static char* create_json_payload_game(tictactoe_handler_t *game_data) {
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~
+[3/8] Linking C static library esp-idf\my_mqtt\libmy_mqtt.a
+[4/8] Generating ld/sections.ld
+[5/8] Linking CXX executable esp32_gui.elf
+[6/8] Generating binary image from built executable
+esptool.py v4.6.2
+Creating esp32 image...
+Merged 26 ELF sections
+Successfully created esp32 image.
+Generated C:/Users/jovic/wes-hack/build/esp32_gui.bin
+[7/8] cmd.exe /C "cd /D C:\Users\jovic\wes-hack\build\esp-idf\esptool_py && C:\Espressif\python_env\idf5.0_py3.11_env\Scripts\python.exe C:/Espressif/frameworks/esp-idf-v5.0.4/components/partition_table/check_sizes.py --offset 0x8000 partition --type app C:/Users/jovic/wes-hack/build/partition_table/partition-table.bin C:/Users/jovic/wes-hack/build/esp32_gui.bin"
+esp32_gui.bin binary size 0x12c710 bytes. Smallest app partition is 0x177000 bytes. 0x4a8f0 bytes (20%) free.
+[7/8] cmd.exe /C "cd /D C:\Espressif\frameworks\esp-idf-v5.0.4\components\esptool_py && C:\Espressif\tools\cmake\3.24.0\bin\cmake.exe -D IDF_PATH=C:/Espressif/frameworks/esp-idf-v5.0.4 -D SERIAL_TOOL=C:/Espressif/python_env/idf5.0_py3.11_env/Scripts/python.exe;;C:/Espressif/frameworks/esp-idf-v5.0.4/components/esptool_py/esptool/esptool.py;--chip;esp32 -D SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args -D WORKING_DIRECTORY=C:/Users/jovic/wes-hack/build -P C:/Espressif/frameworks/esp-idf-v5.0.4/components/esptool_py/run_serial_tool.cmake"
+esptool esp32 -p COM11 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size 2MB 0x1000 bootloader/bootloader.bin 0x10000 esp32_gui.bin 0x8000 partition_table/partition-table.bin
+esptool.py v4.6.2
+Serial port COM11
+Connecting....
+Chip is ESP32-D0WD-V3 (revision v3.0)
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
+Crystal is 40MHz
+MAC: 0c:8b:95:4c:66:28
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00001000 to 0x00007fff...
+Flash will be erased from 0x00010000 to 0x0013cfff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Compressed 26464 bytes to 16484...
+Writing at 0x00001000... (50 %)
+Writing at 0x000076d3... (100 %)
+Wrote 26464 bytes (16484 compressed) at 0x00001000 in 0.9 seconds (effective 240.7 kbit/s)...
+Hash of data verified.
+Compressed 1230608 bytes to 766655...
+Writing at 0x00010000... (2 %)
+Writing at 0x0001a291... (4 %)
+Writing at 0x00025667... (6 %)
+Writing at 0x00032799... (8 %)
+Writing at 0x0003a5f5... (10 %)
+Writing at 0x0003ff34... (12 %)
+Writing at 0x0004ad57... (14 %)
+Writing at 0x000538b1... (17 %)
+Writing at 0x00059499... (19 %)
+Writing at 0x0005f3de... (21 %)
+Writing at 0x00064f88... (23 %)
+Writing at 0x0006aa5e... (25 %)
+Writing at 0x00070248... (27 %)
+Writing at 0x000762ba... (29 %)
+Writing at 0x0007cba7... (31 %)
+Writing at 0x000831ed... (34 %)
+Writing at 0x00088c86... (36 %)
+Writing at 0x0008eafc... (38 %)
+Writing at 0x00094c13... (40 %)
+Writing at 0x0009a941... (42 %)
+Writing at 0x000a04cd... (44 %)
+Writing at 0x000a6066... (46 %)
+Writing at 0x000ac16e... (48 %)
+Writing at 0x000b1e69... (51 %)
+Writing at 0x000b76fa... (53 %)
+Writing at 0x000bcafe... (55 %)
+Writing at 0x000c1e0b... (57 %)
+Writing at 0x000c729c... (59 %)
+Writing at 0x000cc612... (61 %)
+Writing at 0x000d1c40... (63 %)
+Writing at 0x000d74d7... (65 %)
+Writing at 0x000dd27d... (68 %)
+Writing at 0x000e290a... (70 %)
+Writing at 0x000e8044... (72 %)
+Writing at 0x000ed82a... (74 %)
+Writing at 0x000f329c... (76 %)
+Writing at 0x000f89dc... (78 %)
+Writing at 0x000fe536... (80 %)
+Writing at 0x001040af... (82 %)
+Writing at 0x00109ed3... (85 %)
+Writing at 0x00112840... (87 %)
+Writing at 0x0011ae00... (89 %)
+Writing at 0x001211a6... (91 %)
+Writing at 0x0012756d... (93 %)
+Writing at 0x0012cd0a... (95 %)
+Writing at 0x0013270b... (97 %)
+Writing at 0x001380ec... (100 %)
+Wrote 1230608 bytes (766655 compressed) at 0x00010000 in 18.3 seconds (effective 538.8 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 105...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (105 compressed) at 0x00008000 in 0.1 seconds (effective 311.9 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
