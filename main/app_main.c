@@ -11,6 +11,7 @@
 #include "my_mqtt.h"
 #include "temp_hum_sensor.h"
 #include "tictactoe.h"
+#include "joystick.h"
 //---------------------------------- MACROS -----------------------------------
 
 //-------------------------------- DATA TYPES ---------------------------------

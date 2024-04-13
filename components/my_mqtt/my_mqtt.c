@@ -164,13 +164,13 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
 
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-            //char *json_payload = create_json_payload();
+            char *json_payload = create_json_payload();
     
             //vTaskDelay(1000 / portTICK_PERIOD_MS);
-            //ESP_LOGI(TAG, "Publishing to topic WES/Uranus/sensors on INIT");
-            //esp_mqtt_client_publish(client, "WES/Uranus/sensors", json_payload, 0, 1, 0); 
+            ESP_LOGI(TAG, "Publishing to topic WES/Uranus/sensors on INIT");
+            esp_mqtt_client_publish(client, "WES/Uranus/sensors", json_payload, 0, 1, 0); 
             
-            //free(json_payload);
+            free(json_payload);
             esp_mqtt_client_subscribe(client, "WES/Uranus/game", 0);
             ESP_LOGI(TAG, "Subscribed to topic WES/Uranus/game !");
             break;
