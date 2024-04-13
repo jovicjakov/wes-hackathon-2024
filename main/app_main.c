@@ -8,8 +8,8 @@
  */
 
 //--------------------------------- INCLUDES ----------------------------------
-#include "user_interface.h"
-
+#include "my_mqtt.h"
+#include "temp_hum_sensor.h"
 //---------------------------------- MACROS -----------------------------------
 
 //-------------------------------- DATA TYPES ---------------------------------
@@ -18,12 +18,16 @@
 
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 
+static const char *TAG = "MAIN";
 //------------------------------- GLOBAL DATA ---------------------------------
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void app_main(void)
 {
-    user_interface_init();
+    esp_err_t err = temp_sensor_init();
+    if (err != ESP_OK) ESP_LOGI(TAG, "temp/hum sensor init failed");
+    
+    my_mqtt_init();
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
