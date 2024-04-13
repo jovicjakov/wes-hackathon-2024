@@ -12,11 +12,16 @@
 #include "user_interface.h"
 #include "led.h"
 #include "gui.h"
+#include "joystick.h"
+#include "temp_sensor.h"
+#include "accelerometer.h"
 #include "gui_app.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include <stdio.h>
+
+static const char *TAG = "user_interface";
 
 //---------------------------------- MACROS -----------------------------------
 #define USER_INTERFACE_QUEUE_SIZE (20U)
@@ -41,6 +46,11 @@ void user_interface_init(void)
 {
     led_init(LED_BLUE);
     gui_init();
+    //temp_sensor_init();  // getTemperature(); getHumidity();
+    joystick_init();
+    //joystick_startReadingStates();
+    lis2dh12_init();
+    accelerometer_main();
 
     p_user_interface_queue = xQueueCreate(USER_INTERFACE_QUEUE_SIZE, sizeof(gui_app_event_t));
     if(p_user_interface_queue == NULL)

@@ -1,3 +1,8 @@
 {
-    "idf.adapterTargetName": "esp32"
+    "idf.adapterTargetName": "esp32",
+    "files.associations": {
+        "temp_sensor.h": "c",
+        "string.h": "c",
+        "time.h": "c"
+    }
 }

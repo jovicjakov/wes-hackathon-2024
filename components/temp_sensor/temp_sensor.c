@@ -27,7 +27,7 @@ esp_err_t temp_sensor_init(void)
     return i2c_driver_install(i2c_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
 }
 
-/*void temp_sensor_main(void)
+void temp_sensor_main(void)
 {  
     ESP_ERROR_CHECK(temp_sensor_init());
       ESP_ERROR_CHECK(sht31_read_temp_humi(&temp, &humi));
@@ -35,7 +35,7 @@ esp_err_t temp_sensor_init(void)
       ESP_LOGI(TAG, "temp = %.2f, humi = %.2f\n", temp, humi);
       vTaskDelay(2000 / portTICK_PERIOD_MS); 
 
-}*/
+}
 
 static uint8_t sht31_crc(uint8_t *data) {
 
