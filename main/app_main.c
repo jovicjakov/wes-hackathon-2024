@@ -11,6 +11,7 @@
 #include "user_interface.h"
 #include <stdio.h>
 #include "../components/morse/inc/button.h"
+#include "../components/led/led.h"
 //#include <VMA320.h>
 #include "freertos/task.h"
 #include "freertos/FreeRTOS.h"
@@ -38,6 +39,8 @@ void app_main(void)
 {
    (void) _button_init (GPIO_BUTTON_1);
    morse_init ();
+   led_init(LED_BLUE);
+   led_init (LED_RED);
    //buzzer_init ();
    //buzzer_start();
    init_pwm ();

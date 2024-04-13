@@ -12,11 +12,13 @@
 
 
 QueueHandle_t p_morse_queue = NULL;
+QueueHandle_t p_led_queue = NULL;
 static const char *TAG = "BUTTON";
 
 static int64_t last_debounce_time = 0;
 #define DEBOUNCE_DELAY 500000  // Debounce delay in microseconds
 #define MORSE_QUEUE_SIZE (20U)
+#define LED_QUEUE_SIZE (20U)
 #define BUZZER_GPIO 2 // GPIO connected to the buzzer
 #define BUZZER_PWM_CHANNEL LEDC_CHANNEL_0 // PWM channel for the buzzer
 #define BUZZER_PWM_FREQ_HZ 1000 // PWM frequency in Hz
@@ -34,6 +36,7 @@ static void IRAM_ATTR _button_isr(void *p_arg)
         last_debounce_time = current_time;
         int signal = 1;
         xQueueSendFromISR(p_morse_queue, &signal, NULL);
+        xQueueSendFromISR(p_led_queue, &signal, NULL);
     } 
 }
 
@@ -76,10 +79,11 @@ esp_err_t _button_init(uint8_t pin)
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void morse_init(void)
 {
-    led_init (LED_BLUE);
     p_morse_queue = xQueueCreate(MORSE_QUEUE_SIZE, sizeof(int));
+    p_led_queue = xQueueCreate (LED_QUEUE_SIZE, sizeof (int));
     TaskHandle_t morse_task_handle; // Declare a TaskHandle_t variable
-    if(p_morse_queue == NULL)
+    TaskHandle_t led_task_handle; // Declare a TaskHandle_t variable
+    if(p_morse_queue == NULL && p_led_queue == NULL)
     {
         ESP_LOGI(TAG, "Morse queue was not initialized successfully\n");
         return;
@@ -90,6 +94,11 @@ void morse_init(void)
         ESP_LOGI(TAG, "Morse task was not initialized successfully\n");
         return;
     }
+    
+    if (pdPASS != xTaskCreate(&_led_task, "led_task", 2 * 1024, NULL, 5, &led_task_handle)) {
+        ESP_LOGI(TAG, "Led task was not initialized successfully\n");
+        return;
+    }
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
@@ -97,6 +106,7 @@ static void send_sos_ticks (){
     const char *sos = "... --- ...";
 
     for (const char *ch = sos; *ch != '\0'; ch++) {
+        int signal = 1;
         if (*ch == '.') { // Short beep
             // Turn on buzzer
             // Implement code to turn on the buzzer
@@ -108,6 +118,7 @@ static void send_sos_ticks (){
             // Turn off buzzer
             // Implement code to turn off the buzzer
             buzzer_control(0);
+            xQueueSend (p_led_queue, &signal, NULL);
 
             // Pause between beeps
             vTaskDelay(pdMS_TO_TICKS(PAUSE_BETWEEN_BEEPS));
@@ -122,6 +133,7 @@ static void send_sos_ticks (){
             // Turn off buzzer
             // Implement code to turn off the buzzer
             buzzer_control(0);
+            //xQueueSend (p_led_queue, &signal, NULL);
 
             // Pause between beeps
             vTaskDelay(pdMS_TO_TICKS(PAUSE_BETWEEN_BEEPS));
@@ -131,6 +143,13 @@ static void send_sos_ticks (){
         }
     }
 }
+static void sos_signalisation () {
+    printf("LED RED");
+    led_on (LED_RED);
+    vTaskDelay(pdMS_TO_TICKS(800));
+    led_off (LED_RED);
+    vTaskDelay(pdMS_TO_TICKS(200));
+}
 
 static void _morse_task(void *p_parameter) {
 
@@ -139,11 +158,26 @@ static void _morse_task(void *p_parameter) {
     for (;;) {
         if((xQueueReceive(p_morse_queue, &morse_event, portMAX_DELAY) == pdTRUE)){
             printf("Morse event received %d\n", morse_event);
-            led_on (LED_BLUE);
+            //led_on (LED_BLUE);
             //buzzer_start ();
+            //sos_signalisation ();
             send_sos_ticks ();
         }else {
             printf("Morse failed\n");
+        }
+    }
+}
+
+static void _led_task(void *p_parameter) {
+
+    int led_event;
+    
+    for (;;) {
+        if((xQueueReceive(p_led_queue, &led_event, portMAX_DELAY) == pdTRUE)){
+            printf("Led event received %d\n", led_event);
+            sos_signalisation();
+        }else {
+            printf("LED failed\n");
         }
     }
 }
