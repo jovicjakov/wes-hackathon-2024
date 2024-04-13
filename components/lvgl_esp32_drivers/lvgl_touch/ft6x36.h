@@ -158,9 +158,8 @@ uint8_t ft6x36_get_gesture_id();
   * @brief  Get the touch screen X and Y positions values. Ignores multi touch
   * @param  drv:
   * @param  data: Store data here
-  * @retval Always false
   */
-bool ft6x36_read(lv_indev_drv_t *drv, lv_indev_data_t *data);
+void ft6x36_read(lv_indev_drv_t *drv, lv_indev_data_t *data);
 
 #ifdef __cplusplus
 }

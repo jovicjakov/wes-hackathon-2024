@@ -117,9 +117,8 @@ void ft6x06_init(uint16_t dev_addr) {
   * @brief  Get the touch screen X and Y positions values. Ignores multi touch
   * @param  drv:
   * @param  data: Store data here
-  * @retval Always false
   */
-bool ft6x36_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
+void ft6x36_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
     uint8_t data_xy[4];        // 2 bytes X | 2 bytes Y
     uint8_t touch_pnt_cnt;        // Number of detected touch points
     static int16_t last_x = 0;  // 12bit pixel value
@@ -130,7 +129,7 @@ bool ft6x36_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
         data->point.x = last_x;
         data->point.y = last_y;
         data->state = LV_INDEV_STATE_REL;
-        return false;
+        return;
     }
 
     // Read X value
@@ -153,7 +152,7 @@ bool ft6x36_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
         data->point.x = last_x;
         data->point.y = last_y;
         data->state = LV_INDEV_STATE_REL;   // no touch detected
-        return false;
+        return;
     }
 
     // Read Y value
@@ -176,7 +175,7 @@ bool ft6x36_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
         data->point.x = last_x;
         data->point.y = last_y;
         data->state = LV_INDEV_STATE_REL;   // no touch detected
-        return false;
+        return;
     }
 
     last_x = ((data_xy[0] & FT6X36_MSB_MASK) << 8) | (data_xy[1] & FT6X36_LSB_MASK);
@@ -197,5 +196,4 @@ bool ft6x36_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
     data->point.y = last_y;
     data->state = LV_INDEV_STATE_PR;
     ESP_LOGV(TAG, "X=%u Y=%u", data->point.x, data->point.y);
-    return false;
 }

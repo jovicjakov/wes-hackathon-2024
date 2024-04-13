@@ -110,9 +110,8 @@ void stmpe610_init(void)
 /**
  * Get the current position and state of the touchpad
  * @param data store the read data here
- * @return false: because no more data to be read
  */
-bool stmpe610_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
+void stmpe610_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
     static int16_t last_x = 0;
     static int16_t last_y = 0;
@@ -157,8 +156,6 @@ bool stmpe610_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
     data->point.x = (int16_t) x;
     data->point.y = (int16_t) y;
     data->state = valid == false ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR;
-
-    return false;
 }
 
 

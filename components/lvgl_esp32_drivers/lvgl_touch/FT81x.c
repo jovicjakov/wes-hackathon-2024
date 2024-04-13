@@ -47,9 +47,8 @@
 /**
  * Get the current position and state of the touchpad
  * @param data store the read data here
- * @return false: because no more data to be read
  */
-bool FT81x_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
+void FT81x_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
     static int16_t last_x = 0;
     static int16_t last_y = 0;
@@ -75,8 +74,6 @@ bool FT81x_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
     data->point.x = X;
     data->point.y = Y;
     data->state = (touched == false ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR);
-
-    return false;
 }
 
 

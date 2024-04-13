@@ -102,9 +102,8 @@ void ra8875_touch_enable(bool enable)
 /**
  * Get the current position and state of the touchscreen
  * @param data store the read data here
- * @return false: because no more data to be read
  */
-bool ra8875_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
+void ra8875_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
     static int x = 0;
     static int y = 0;
@@ -138,8 +137,6 @@ bool ra8875_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
 #if DEBUG
         ESP_LOGI(TAG, "Touch Poll - Event: %d; %d,%d", data->state, data->point.x, data->point.y);
 #endif
-
-    return false;
 }
 
 
