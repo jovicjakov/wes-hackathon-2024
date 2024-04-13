@@ -165,7 +165,10 @@ static void _button_event_handler(lv_event_t *p_event)
             printf("me first\n");
             gui_app_event_t event = GUI_APP_EVENT_ME_FIRST_BUTTON_PRESSED;
             if (gui_queue != NULL)
+            {
+                printf("gui: sent to tictactoe\n");
                 xQueueSend(gui_queue, &event, 0U);
+            }
             lv_scr_load(screen1);
         }
     }
@@ -176,7 +179,10 @@ static void _button_event_handler(lv_event_t *p_event)
             printf("earthling first\n");
             gui_app_event_t event = GUI_APP_EVENT_EARTHLING_FIRST_BUTTON_PRESSED;
             if (gui_queue != NULL)
+            {
+                printf("gui: sent to tictactoe\n");
                 xQueueSend(gui_queue, &event, 0U);
+            }
             lv_scr_load(screen1);
         }
     }
