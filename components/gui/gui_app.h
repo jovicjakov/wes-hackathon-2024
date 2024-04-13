@@ -15,9 +15,10 @@ extern "C"
 {
 #endif
 
-    //--------------------------------- INCLUDES ----------------------------------
+//--------------------------------- INCLUDES ----------------------------------
 
-    //---------------------------------- MACROS -----------------------------------
+//---------------------------------- MACROS -----------------------------------
+#define GUI_QUEUE_SIZE (20U)
 
     //-------------------------------- DATA TYPES ---------------------------------
     /**
@@ -26,10 +27,8 @@ extern "C"
      */
     typedef enum
     {
-        GUI_APP_EVENT_BUTTON_LED_ON_PRESSED,
-        GUI_APP_EVENT_BUTTON_LED_OFF_PRESSED,
-
-        GUI_APP_EVENT_COUNT
+        GUI_APP_EVENT_ME_FIRST_BUTTON_PRESSED,
+        GUI_APP_EVENT_EARTHLING_FIRST_BUTTON_PRESSED
     } gui_app_event_t;
 
     //---------------------- PUBLIC FUNCTION PROTOTYPES --------------------------
