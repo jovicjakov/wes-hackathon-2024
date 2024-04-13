@@ -9,6 +9,7 @@
 
 //--------------------------------- INCLUDES ----------------------------------
 #include "user_interface.h"
+#include "tictactoe.h"
 
 //---------------------------------- MACROS -----------------------------------
 
@@ -23,7 +24,8 @@
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void app_main(void)
 {
-    user_interface_init();
+    // user_interface_init();
+    tictactoe_init();
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
