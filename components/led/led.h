@@ -27,6 +27,7 @@ extern "C" {
 typedef enum
 {
     LED_BLUE,
+    LED_RED,
 
     LED_COUNT
 } led_t;

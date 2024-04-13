@@ -33,6 +33,7 @@ typedef struct
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 static const _led_config_t _led_info[LED_COUNT] = {
     { .led = LED_BLUE, .gpio = 14, .b_is_active_on_high_level = true },
+    { .led = LED_RED, .gpio = 26, .b_is_active_on_high_level = true },
 };
 //------------------------------- GLOBAL DATA ---------------------------------
 
