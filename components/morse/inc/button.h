@@ -37,3 +37,4 @@ esp_err_t _button_init(uint8_t pin);
 
 void morse_init(void);
 static void _morse_task(void *p_parameter);
+esp_err_t buzzer_init(void);

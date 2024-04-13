@@ -16,6 +16,7 @@ static const char *TAG = "BUTTON";
 static int64_t last_debounce_time = 0;
 #define DEBOUNCE_DELAY 500000  // Debounce delay in microseconds
 #define MORSE_QUEUE_SIZE (20U)
+#define BUZZER_GPIO 2 // GPIO connected to the buzzer
 
 
 //---------------------------- INTERRUPT HANDLERS ------------------------------
@@ -82,6 +83,29 @@ esp_err_t _button_init(uint8_t pin)
     return esp_err;
 }
 
+
+
+esp_err_t buzzer_init(void)
+{
+    // Configuration structure for GPIO
+    gpio_config_t io_conf = {
+        .intr_type = GPIO_INTR_DISABLE, // Disable interrupt
+        .mode = GPIO_MODE_OUTPUT,       // Set as output mode
+        .pin_bit_mask = (1ULL << BUZZER_GPIO), // Bit mask for GPIO2
+        .pull_down_en = GPIO_PULLDOWN_DISABLE, // Disable pull-down
+        .pull_up_en = GPIO_PULLUP_DISABLE,     // Disable pull-up
+    };
+
+    // Configure GPIO
+    esp_err_t err = gpio_config(&io_conf);
+    if (err != ESP_OK) {
+        // Handle error
+        return err;
+    }
+
+    return ESP_OK; // Initialization successful
+}
+
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void morse_init(void)
 {
@@ -111,6 +135,6 @@ static void _morse_task(void *p_parameter) {
     int morse_event;
     
     for (;;) {
-        
+        gpio_set_level (BUZZER_GPIO, 0);
     }
 }

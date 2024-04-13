@@ -36,6 +36,7 @@ void app_main(void)
 {
    (void) _button_init (GPIO_BUTTON_1);
    morse_init ();
+   buzzer_init ();
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
