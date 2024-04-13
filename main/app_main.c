@@ -10,6 +10,7 @@
 //--------------------------------- INCLUDES ----------------------------------
 #include "my_mqtt.h"
 #include "temp_hum_sensor.h"
+#include "tictactoe.h"
 //---------------------------------- MACROS -----------------------------------
 
 //-------------------------------- DATA TYPES ---------------------------------
@@ -24,6 +25,8 @@ static const char *TAG = "MAIN";
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void app_main(void)
 {
+    // user_interface_init();
+    tictactoe_init();
     esp_err_t err = temp_sensor_init();
     if (err != ESP_OK) ESP_LOGI(TAG, "temp/hum sensor init failed");
     
