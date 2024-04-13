@@ -34,7 +34,7 @@ void app_main(void)
 
     my_mqtt_init();
 
-    joystick_init();
+    //joystick_init();
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
