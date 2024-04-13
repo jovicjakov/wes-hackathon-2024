@@ -31,6 +31,8 @@ void app_main(void)
     if (err != ESP_OK) ESP_LOGI(TAG, "temp/hum sensor init failed");
     
     my_mqtt_init();
+
+    joystick_init();
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------

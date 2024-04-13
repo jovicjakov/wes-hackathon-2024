@@ -33,6 +33,7 @@
 #include <cJSON.h>
 #include "temp_hum_sensor.h"
 #include <math.h>
+#include "tictactoe.h"
 
 //---------------------------------- MACROS -----------------------------------
 #define DELAY_TIME_MS   (1000U)
@@ -49,18 +50,8 @@ static void _create_demo_application(void);
 static const char *TAG = "MY_MQTT";
 
 static void mqtt5_app_start(void);
+static void my_mqtt_task(void *pvParameters);
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
-typedef enum
-{
-   DEVICE,
-   SERVER
-} tictactoe_turn_t;
-
-typedef struct {
-    int indexX[9];  // Places where 'X' is marked
-    int indexO[9];  // Places where 'O' is marked
-    tictactoe_turn_t turn;  // Whose turn is it
-} tictactoe_handler_t;
 
 //------------------------------- GLOBAL DATA ---------------------------------
 esp_mqtt_client_handle_t client;
@@ -69,7 +60,7 @@ extern QueueHandle_t p_tictactoe_queue;
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void my_mqtt_init()
 {  
-    //xTaskCreate(mqtt_publish_task, "MQTT Publish Task", 2048, NULL, 10, NULL);
+    xTaskCreate(my_mqtt_task, "MQTT Publish Task", 2048, NULL, 10, NULL);
 
     ESP_LOGI(TAG, "[APP] Startup..");
     ESP_LOGI(TAG, "[APP] Free memory: %" PRIu32 " bytes", esp_get_free_heap_size());
@@ -128,20 +119,24 @@ static char* create_json_payload(void) {
 }
 
 static char* create_json_payload_game(tictactoe_handler_t *game_data) {
+    if (game_data == NULL) {
+        return NULL; // Safety check to handle possible null pointers
+    }
+
     cJSON *root = cJSON_CreateObject();
 
-    cJSON *jsonIndexX = cJSON_CreateIntArray(game_data->indexX, 9);
-    cJSON *jsonIndexO = cJSON_CreateIntArray(game_data->indexO, 9);
-    const char *turnString = game_data->turn == 0 ? "device" : "server";
+    cJSON *jsonIndexX = cJSON_CreateIntArray(game_data->index_of_X, 9);
+    cJSON *jsonIndexO = cJSON_CreateIntArray(game_data->index_of_Y, 9);
+    const char *turnString = game_data->turn == DEVICE ? "DEVICE" : "SERVER";  // Maintain case consistency
 
     cJSON_AddItemToObject(root, "indexX", jsonIndexX);
     cJSON_AddItemToObject(root, "indexO", jsonIndexO);
     cJSON_AddStringToObject(root, "turn", turnString);
 
-    char *formatted_json = cJSON_Print(root);
+    char *formatted_json = cJSON_Print(root);  // This needs to be freed by the caller
     printf("JSON Output: %s\n", formatted_json);
 
-    cJSON_Delete(root);
+    cJSON_Delete(root);  // Properly delete the root object to avoid memory leaks
     return formatted_json;
 }
 
@@ -169,13 +164,15 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
 
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-            char *json_payload = create_json_payload();
+            //char *json_payload = create_json_payload();
     
-            ESP_LOGI(TAG, "Publishing to topic WES/Uranus/sensors on INIT");
-            esp_mqtt_client_publish(client, "WES/Uranus/sensors", json_payload, 0, 1, 0); 
+            //vTaskDelay(1000 / portTICK_PERIOD_MS);
+            //ESP_LOGI(TAG, "Publishing to topic WES/Uranus/sensors on INIT");
+            //esp_mqtt_client_publish(client, "WES/Uranus/sensors", json_payload, 0, 1, 0); 
             
-            free(json_payload);
+            //free(json_payload);
             esp_mqtt_client_subscribe(client, "WES/Uranus/game", 0);
+            ESP_LOGI(TAG, "Subscribed to topic WES/Uranus/game !");
             break;
 
         case MQTT_EVENT_DISCONNECTED:
@@ -205,37 +202,65 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
                     fprintf(stderr, "Error before: %s\n", error_ptr);
                 }
                 ESP_LOGE(TAG, "Failed to parse JSON");
+                
             } else {
-                // Extract the game state from the JSON
                 cJSON *indexX = cJSON_GetObjectItemCaseSensitive(root, "indexX");
                 cJSON *indexO = cJSON_GetObjectItemCaseSensitive(root, "indexO");
                 cJSON *turn = cJSON_GetObjectItemCaseSensitive(root, "turn");
 
                 if (cJSON_IsArray(indexX) && cJSON_IsArray(indexO) && cJSON_IsString(turn)) {
                     printf("Turn: %s\n", turn->valuestring);
+
+                    // Initialize a tictactoe_handler_t structure to be sent to the queue
+                    tictactoe_handler_t game_state;
+                    memset(&game_state, 0, sizeof(game_state));  // Zero out the structure
+
+                    // Assign turn based on received data
+                    if (strcmp(turn->valuestring, "DEVICE") == 0) {
+                        game_state.turn = DEVICE;
+                    } else if (strcmp(turn->valuestring, "SERVER") == 0) {
+                        game_state.turn = SERVER;
+                    }
+
+                    // Fill indexX array
                     printf("IndexX: ");
-                    for (int i = 0; i < cJSON_GetArraySize(indexX); i++) {
+                    int count = cJSON_GetArraySize(indexX);
+                    count = count > 9 ? 9 : count;  // Ensure not to overflow the array
+                    for (int i = 0; i < count; i++) {
                         cJSON *ix = cJSON_GetArrayItem(indexX, i);
                         if (cJSON_IsNumber(ix)) {
+                            game_state.index_of_X[i] = ix->valueint;
                             printf("%d ", ix->valueint);
                         }
                     }
-                    printf("\nIndexO: ");
-                    for (int i = 0; i < cJSON_GetArraySize(indexO); i++) {
+                    printf("\n");
+
+                    // Fill indexO array
+                    printf("IndexO: ");
+                    count = cJSON_GetArraySize(indexO);
+                    count = count > 9 ? 9 : count;  // Ensure not to overflow the array
+                    for (int i = 0; i < count; i++) {
                         cJSON *io = cJSON_GetArrayItem(indexO, i);
                         if (cJSON_IsNumber(io)) {
+                            game_state.index_of_Y[i] = io->valueint;
                             printf("%d ", io->valueint);
                         }
                     }
                     printf("\n");
+
+                    // Send the game state to the queue
+                    if (xQueueSend(p_tictactoe_queue, &game_state, portMAX_DELAY) != pdPASS) {
+                        ESP_LOGE(TAG, "Failed to send to tictactoe queue");
+                    }
                 } else {
                     ESP_LOGE(TAG, "JSON does not contain the expected structure or types");
                 }
 
                 // Free the JSON object
-                cJSON_Delete(root);
+                cJSON_Delete(root);  
             }
             break;
+
 
         case MQTT_EVENT_ERROR:
             ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -254,7 +279,7 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
 static void mqtt5_app_start(void)
 {
     esp_mqtt_client_config_t mqtt_cfg = {
-        .broker.address.uri = "mqtt://192.168.254.6:1883",
+        .broker.address.uri = "mqtt://4gpc.l.time4vps.cloud",
     };
 
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
@@ -276,11 +301,16 @@ static void my_mqtt_task(void *pvParameters) {
             //esp_mqtt_client_publish("your/mqtt/topic", msg, 0, 0); // Adjust topic, QoS, retain as needed
         //}
 
-        // if(xQueueRecieve(p_tictactoe_queue, &tictactoe_msg, portMAX_DELAY) == pdPASS) {
-        //     ESP_LOGI(TAG, "Publishing move!");
-        //     char *json_payload = create_json_payload_game(&tictactoe_msg);
-        //     esp_mqtt_client_publish(client, "WES/Uranus/game", json_payload, 0, 1, 0);
-        // }
+        if (xQueueReceive(p_tictactoe_queue, &tictactoe_msg, portMAX_DELAY) == pdPASS) {
+            ESP_LOGI(TAG, "Publishing move!");
+            char *json_payload = create_json_payload_game(&tictactoe_msg);
+            if (json_payload != NULL) {
+                esp_mqtt_client_publish(client, "WES/Uranus/game", json_payload, 0, 1, 0);
+                free(json_payload);  // Free the JSON string after publishing it
+            } else {
+                ESP_LOGE(TAG, "Failed to create JSON payload");
+            }
+        }
     }
 }
 
