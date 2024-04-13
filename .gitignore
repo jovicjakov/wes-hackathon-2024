@@ -1,0 +1,6 @@
+.vscode
+build
+dependences.lock
+Makefile
+sdkconfig
+sdkconfig.defaults

@@ -9,6 +9,17 @@
 
 //--------------------------------- INCLUDES ----------------------------------
 #include "user_interface.h"
+#include <stdio.h>
+#include "../components/morse/inc/button.h"
+//#include <VMA320.h>
+#include "freertos/task.h"
+#include "freertos/FreeRTOS.h"
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+#include "esp_system.h"
+#include "esp_event.h"
+#include "esp_log.h"
 
 //---------------------------------- MACROS -----------------------------------
 
@@ -23,7 +34,8 @@
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 void app_main(void)
 {
-    user_interface_init();
+   (void) _button_init (GPIO_BUTTON_1);
+   morse_init ();
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
