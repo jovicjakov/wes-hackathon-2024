@@ -11,22 +11,28 @@
 #include "gui_app.h"
 // #include "tictactoe.h"
 #include <stdio.h>
+#include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "freertos/portmacro.h"
 #include "esp_log.h"
 
 /* Littlevgl specific */
 #include "lvgl.h"
 #include "lvgl_helpers.h"
 #include "lv_conf.h"
+#include "my_mqtt.h"
+#include "temp_hum_sensor.h"
 //---------------------------------- MACROS -----------------------------------
 #define SCREEN_HEIGHT 240
 #define SCREEN_WIDTH 320
 
 #define Y_ALIGN 30
 #define X_ALIGN 45
-#define X_ALIGN_CENTER 30
+#define X_ALIGN_CENTER 15
+
+#define FADE_IN_TIME 500
 
 //-------------------------------- DATA TYPES ---------------------------------
 
@@ -37,6 +43,7 @@
  * @param [in] p_event Pointer to the event type.
  */
 static void _button_event_handler(lv_event_t *p_event);
+static void _wait_for_sensor_input_task(void *p_parameter);
 
 /**
  * @brief The function unblockingly sends an event to the user interface queue.
@@ -45,7 +52,9 @@ static void _button_event_handler(lv_event_t *p_event);
  */
 
 static void button_matrix_init(void);
+static void labels_init(void);
 static void select_first_player_buttons_init(void);
+static void sensor_table_init(void);
 
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 
@@ -59,9 +68,19 @@ lv_obj_t **p_labels;
 lv_obj_t *btnm1;
 lv_obj_t *p_btn_me_first;
 lv_obj_t *p_btn_earthling_first;
-QueueHandle_t gui_queue = NULL;
+lv_obj_t *mqtt_connected_label;
+lv_obj_t *temp_label;
+lv_obj_t *humidity_label;
+lv_obj_t *time_label;
+lv_obj_t *table;
+
 lv_obj_t *screen1;
 lv_obj_t *screen2;
+lv_obj_t *screen3;
+QueueHandle_t gui_queue = NULL;
+QueueHandle_t temp_hum_to_gui_queue = NULL;
+QueueHandle_t time_to_gui_queue = NULL;
+QueueHandle_t joystick_to_gui_queue = NULL;
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
 
@@ -69,41 +88,33 @@ void gui_app_init(void)
 {
     screen1 = lv_obj_create(NULL);
     screen2 = lv_obj_create(NULL);
+    screen3 = lv_obj_create(NULL);
+    table = lv_table_create(screen3);
     button_matrix_init();
     select_first_player_buttons_init();
-
-    p_labels = lv_mem_alloc(9 * sizeof(btnm1));
-    for (int i = 0; i < 9; i++)
-    {
-        p_labels[i] = lv_label_create(screen1);
-        lv_label_set_text(p_labels[i], " ");
-        lv_obj_set_style_text_font(p_labels[i], &lv_font_montserrat_38, 0);
-    }
-    lv_obj_align_to(p_labels[0], NULL, LV_ALIGN_TOP_LEFT, X_ALIGN, Y_ALIGN);
-    lv_obj_align_to(p_labels[1], NULL, LV_ALIGN_TOP_MID, 0, Y_ALIGN);
-    lv_obj_align_to(p_labels[2], NULL, LV_ALIGN_TOP_RIGHT, -X_ALIGN, Y_ALIGN);
-    lv_obj_align_to(p_labels[3], NULL, LV_ALIGN_LEFT_MID, X_ALIGN, 0);
-    lv_obj_align_to(p_labels[4], NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_align_to(p_labels[5], NULL, LV_ALIGN_RIGHT_MID, -X_ALIGN, 0);
-    lv_obj_align_to(p_labels[6], NULL, LV_ALIGN_BOTTOM_LEFT, X_ALIGN, -Y_ALIGN);
-    lv_obj_align_to(p_labels[7], NULL, LV_ALIGN_BOTTOM_MID, 0, -Y_ALIGN);
-    lv_obj_align_to(p_labels[8], NULL, LV_ALIGN_BOTTOM_RIGHT, -X_ALIGN, -Y_ALIGN);
+    labels_init();
+    sensor_table_init();
 
     gui_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(gui_app_event_t));
+    temp_hum_to_gui_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(gui_sensor_packet_t));
+    time_to_gui_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(gui_sensor_packet_t));
+    joystick_to_gui_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(gui_sensor_packet_t));
     if (gui_queue == NULL)
     {
         printf("User interface queue was not initialized successfully\n");
         return;
     }
-    lv_scr_load(screen2);
 
-    // crtaj_xo(1, "x");
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
-    // crtaj_xo(2, "o");
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
-    // crtaj_xo(8, "x");
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
-    // crtaj_xo(5, "o");
+    while (!is_mqtt_connected())
+    {
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+    lv_scr_load(screen2);
+    if (pdPASS != xTaskCreate(&_wait_for_sensor_input_task, "_wait_for_sensor_input_task", 2 * 1024, NULL, 5, NULL))
+    {
+        printf("_wait_for_sensor_input_tasktask was not initialized successfully\n");
+    }
+    // lv_label_set_text(mqtt_connected_label, "Who do you want to play first Uranusborn?");
 }
 
 void crtaj_xo(int position, char *symbol)
@@ -137,19 +148,44 @@ static void button_matrix_init(void)
     lv_obj_set_height(btnm1, SCREEN_HEIGHT);
 }
 
+static void labels_init()
+{
+    mqtt_connected_label = lv_label_create(screen2);
+    lv_obj_set_style_text_font(mqtt_connected_label, &lv_font_montserrat_14, 0);
+    lv_label_set_text(mqtt_connected_label, "Who do you want to play first Uranusborn?");
+    lv_obj_align_to(mqtt_connected_label, NULL, LV_ALIGN_TOP_MID, 0, 2 * Y_ALIGN);
+
+    p_labels = lv_mem_alloc(9 * sizeof(btnm1));
+    for (int i = 0; i < 9; i++)
+    {
+        p_labels[i] = lv_label_create(screen1);
+        lv_label_set_text(p_labels[i], " ");
+        lv_obj_set_style_text_font(p_labels[i], &lv_font_montserrat_38, 0);
+    }
+    lv_obj_align_to(p_labels[0], NULL, LV_ALIGN_TOP_LEFT, X_ALIGN, Y_ALIGN);
+    lv_obj_align_to(p_labels[1], NULL, LV_ALIGN_TOP_MID, 0, Y_ALIGN);
+    lv_obj_align_to(p_labels[2], NULL, LV_ALIGN_TOP_RIGHT, -X_ALIGN, Y_ALIGN);
+    lv_obj_align_to(p_labels[3], NULL, LV_ALIGN_LEFT_MID, X_ALIGN, 0);
+    lv_obj_align_to(p_labels[4], NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align_to(p_labels[5], NULL, LV_ALIGN_RIGHT_MID, -X_ALIGN, 0);
+    lv_obj_align_to(p_labels[6], NULL, LV_ALIGN_BOTTOM_LEFT, X_ALIGN, -Y_ALIGN);
+    lv_obj_align_to(p_labels[7], NULL, LV_ALIGN_BOTTOM_MID, 0, -Y_ALIGN);
+    lv_obj_align_to(p_labels[8], NULL, LV_ALIGN_BOTTOM_RIGHT, -X_ALIGN, -Y_ALIGN);
+}
+
 static void select_first_player_buttons_init(void)
 {
 
     /* Create buttons */
     lv_obj_t *p_label_me_first;
     p_btn_me_first = lv_btn_create(screen2);
-    lv_obj_align_to(p_btn_me_first, NULL, LV_ALIGN_CENTER, -4 * X_ALIGN_CENTER, 0);
+    lv_obj_align_to(p_btn_me_first, NULL, LV_ALIGN_CENTER, -7 * X_ALIGN_CENTER, Y_ALIGN / 2);
     p_label_me_first = lv_label_create(p_btn_me_first);
     lv_label_set_text(p_label_me_first, "Me first");
 
     lv_obj_t *p_label_earthling_first;
     p_btn_earthling_first = lv_btn_create(screen2);
-    lv_obj_align_to(p_btn_earthling_first, NULL, LV_ALIGN_CENTER, X_ALIGN_CENTER, 0);
+    lv_obj_align_to(p_btn_earthling_first, NULL, LV_ALIGN_CENTER, X_ALIGN_CENTER, Y_ALIGN / 2);
     p_label_earthling_first = lv_label_create(p_btn_earthling_first);
     lv_label_set_text(p_label_earthling_first, "Earthling first");
 
@@ -158,9 +194,20 @@ static void select_first_player_buttons_init(void)
     (void)lv_obj_add_event_cb(p_btn_earthling_first, _button_event_handler, LV_EVENT_CLICKED, NULL);
 }
 
+static void sensor_table_init()
+{
+    lv_table_set_cell_value(table, 0, 0, "Time");
+    lv_table_set_cell_value(table, 1, 0, "Temperature");
+    lv_table_set_cell_value(table, 2, 0, "Humidity");
+    lv_table_set_cell_value(table, 0, 1, "13:24");
+    lv_table_set_cell_value(table, 1, 1, "24 °C");
+    lv_table_set_cell_value(table, 2, 1, "mokro");
+}
+
 static void _button_event_handler(lv_event_t *p_event)
 {
-    if (p_btn_me_first == p_event->target)
+
+    if (p_btn_me_first == p_event->target && is_mqtt_connected())
     {
         if (LV_EVENT_CLICKED == p_event->code)
         {
@@ -171,10 +218,10 @@ static void _button_event_handler(lv_event_t *p_event)
                 printf("gui: sent to tictactoe\n");
                 xQueueSend(gui_queue, &event, 0U);
             }
-            lv_scr_load(screen1);
+            lv_scr_load_anim(screen1, LV_SCR_LOAD_ANIM_FADE_IN, FADE_IN_TIME, 0, false);
         }
     }
-    else if (p_btn_earthling_first == p_event->target)
+    else if (p_btn_earthling_first == p_event->target && is_mqtt_connected())
     {
         if (LV_EVENT_CLICKED == p_event->code)
         {
@@ -185,12 +232,46 @@ static void _button_event_handler(lv_event_t *p_event)
                 printf("gui: sent to tictactoe\n");
                 xQueueSend(gui_queue, &event, 0U);
             }
-            lv_scr_load(screen1);
+            lv_scr_load_anim(screen1, LV_SCR_LOAD_ANIM_FADE_IN, FADE_IN_TIME, 0, false);
         }
     }
     else
     {
         /* Unknown button event. */
+    }
+}
+
+static void _wait_for_sensor_input_task(void *p_parameter)
+{
+    for (;;)
+    {
+
+        int switch_screen = 0;
+        TempHumData packet;
+        if (temp_hum_to_gui_queue != NULL && (xQueueReceive(temp_to_gui_queue, &packet, 100 / portTICK_PERIOD_MS) == pdTRUE))
+        {
+            char temp[8];
+            snprintf(temp, 8, "%f", packet.temperature);
+            char hum[8];
+            snprintf(hum, 8, "%f", packet.humidity);
+            lv_table_set_cell_value(table, 1, 1, temp);
+            lv_table_set_cell_value(table, 2, 1, hum);
+        }
+        // if (time_to_gui_queue != NULL && (xQueueReceive(temp_to_gui_queue, &packet, 100 / portTICK_PERIOD_MS) == pdTRUE))
+        // {
+        //     lv_table_set_cell_value(table, 1, 1, );
+        // }
+        if (joystick_to_gui_queue != NULL && (xQueueReceive(joystick_to_gui_queue, &switch_screen, 200 / portTICK_PERIOD_MS) == pdTRUE))
+        {
+            if (switch_screen == 1 && (lv_disp_get_scr_act(NULL) == screen1))
+            {
+                lv_scr_load_anim(screen3, LV_SCR_LOAD_ANIM_MOVE_LEFT, 2 * FADE_IN_TIME, 0, false);
+            }
+            else if (switch_screen == -1 && (lv_disp_get_scr_act(NULL) == screen3))
+            {
+                lv_scr_load_anim(screen1, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 2 * FADE_IN_TIME, 0, false);
+            }
+        }
     }
 }
 

@@ -41,6 +41,15 @@ extern "C"
 
     } gui_app_event_t;
 
+    typedef struct
+    {
+        int hours;
+        int minutes;
+        int seconds;
+        int temperature;
+        int humidity;
+    } gui_sensor_packet_t;
+
     //---------------------- PUBLIC FUNCTION PROTOTYPES --------------------------
     /**
      * @brief The function initialized first screen.

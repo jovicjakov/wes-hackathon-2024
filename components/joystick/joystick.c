@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 #include "esp_log.h"
 #include <sys/time.h>
 
@@ -28,8 +29,10 @@
 static int adc_raw[2];
 static adc_oneshot_unit_handle_t adc1_handle;
 static TaskHandle_t joystick_task_handle = NULL;
+extern QueueHandle_t joystick_to_gui_queue;
 
-enum inputs {
+enum inputs
+{
     INPUT_PUSH_BUTTON,
     INPUT_UP_ARROW,
     INPUT_DOWN_ARROW,
@@ -46,7 +49,8 @@ static void joystick_task(void *pvParameters);
 void joystick_init(void);
 void inputHandler(int input);
 
-void joystick_init(void) {
+void joystick_init(void)
+{
     adc_oneshot_unit_init_cfg_t init_config1 = {.unit_id = ADC_UNIT_1};
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
 
@@ -61,69 +65,88 @@ void joystick_init(void) {
     bool calibrated_chan0 = example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN0, EXAMPLE_ADC_ATTEN, &adc1_cali_chan0_handle);
     bool calibrated_chan1 = example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN1, EXAMPLE_ADC_ATTEN, &adc1_cali_chan1_handle);
 
-    if (joystick_task_handle == NULL) {
+    if (joystick_task_handle == NULL)
+    {
         xTaskCreate(joystick_task, "joystick_task", TASK_STACK_SIZE, NULL, TASK_PRIORITY, &joystick_task_handle);
     }
 }
 
-void inputHandler(int input) {
-    switch(input) {
-        case INPUT_UP_ARROW:
-            ESP_LOGI(TAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^UP");
+void inputHandler(int input)
+{
+    switch (input)
+    {
+    case INPUT_UP_ARROW:
+        ESP_LOGI(TAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^UP");
         break;
-        case INPUT_DOWN_ARROW:
-            ESP_LOGI(TAG, "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||DOWN");
+    case INPUT_DOWN_ARROW:
+        ESP_LOGI(TAG, "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||DOWN");
         break;
-        case INPUT_LEFT_ARROW:
-            ESP_LOGI(TAG, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LEFT");
+    case INPUT_LEFT_ARROW:
+        ESP_LOGI(TAG, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<LEFT");
+        int left = -1;
+        xQueueSend(joystick_to_gui_queue, &left, 0U);
         break;
-        case INPUT_RIGHT_ARROW:
-            ESP_LOGI(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>RIGHT");
+    case INPUT_RIGHT_ARROW:
+        ESP_LOGI(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>RIGHT");
+        int right = 1;
+        xQueueSend(joystick_to_gui_queue, &right, 0U);
         break;
-        case INPUT_BACK_TO_CENTRE:
-            ESP_LOGI(TAG, "================================================================================centre");
+    case INPUT_BACK_TO_CENTRE:
+        ESP_LOGI(TAG, "================================================================================centre");
         break;
-        default:
+    default:
         break;
     }
 }
 
-static void joystick_task(void *pvParameters) {
-    while (true) {
+static void joystick_task(void *pvParameters)
+{
+    while (true)
+    {
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
 
-        if (adc_raw[0] <= 1000) {
+        if (adc_raw[0] <= 1000)
+        {
             inputHandler(INPUT_RIGHT_ARROW);
-            while (adc_raw[0] < 1500) {
+            while (adc_raw[0] < 1500)
+            {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
                 vTaskDelay(pdMS_TO_TICKS(50));
             }
             inputHandler(INPUT_BACK_TO_CENTRE);
-        } else if (adc_raw[0] >= 3500) {
+        }
+        else if (adc_raw[0] >= 3500)
+        {
             inputHandler(INPUT_LEFT_ARROW);
-            while (adc_raw[0] < 1500 || adc_raw[0] > 2500) {
+            while (adc_raw[0] < 1500 || adc_raw[0] > 2500)
+            {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
                 vTaskDelay(pdMS_TO_TICKS(50));
             }
             inputHandler(INPUT_BACK_TO_CENTRE);
-        } else if (adc_raw[1] <= 500) {
+        }
+        else if (adc_raw[1] <= 500)
+        {
             inputHandler(INPUT_UP_ARROW);
-            while (adc_raw[1] < 1500 || adc_raw[1] > 2500) {
+            while (adc_raw[1] < 1500 || adc_raw[1] > 2500)
+            {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
                 vTaskDelay(pdMS_TO_TICKS(50));
             }
             inputHandler(INPUT_BACK_TO_CENTRE);
-        } else if (adc_raw[1] >= 4000) {
+        }
+        else if (adc_raw[1] >= 4000)
+        {
             inputHandler(INPUT_DOWN_ARROW);
-            while (adc_raw[1] < 1500 || adc_raw[1] > 2500) {
+            while (adc_raw[1] < 1500 || adc_raw[1] > 2500)
+            {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
                 vTaskDelay(pdMS_TO_TICKS(50));
             }
             inputHandler(INPUT_BACK_TO_CENTRE);
         }
     }
-    
 }
 
 /*---------------------------------------------------------------
@@ -136,7 +159,8 @@ static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel,
     bool calibrated = false;
 
 #if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
-    if (!calibrated) {
+    if (!calibrated)
+    {
         ESP_LOGI(TAG, "calibration scheme version is %s", "Curve Fitting");
         adc_cali_curve_fitting_config_t cali_config = {
             .unit_id = unit,
@@ -145,14 +169,16 @@ static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel,
             .bitwidth = ADC_BITWIDTH_DEFAULT,
         };
         ret = adc_cali_create_scheme_curve_fitting(&cali_config, &handle);
-        if (ret == ESP_OK) {
+        if (ret == ESP_OK)
+        {
             calibrated = true;
         }
     }
 #endif
 
 #if ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
-    if (!calibrated) {
+    if (!calibrated)
+    {
         ESP_LOGI(TAG, "calibration scheme version is %s", "Line Fitting");
         adc_cali_line_fitting_config_t cali_config = {
             .unit_id = unit,
@@ -160,18 +186,24 @@ static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel,
             .bitwidth = ADC_BITWIDTH_DEFAULT,
         };
         ret = adc_cali_create_scheme_line_fitting(&cali_config, &handle);
-        if (ret == ESP_OK) {
+        if (ret == ESP_OK)
+        {
             calibrated = true;
         }
     }
 #endif
 
     *out_handle = handle;
-    if (ret == ESP_OK) {
+    if (ret == ESP_OK)
+    {
         ESP_LOGI(TAG, "Calibration Success");
-    } else if (ret == ESP_ERR_NOT_SUPPORTED || !calibrated) {
+    }
+    else if (ret == ESP_ERR_NOT_SUPPORTED || !calibrated)
+    {
         ESP_LOGW(TAG, "eFuse not burnt, skip software calibration");
-    } else {
+    }
+    else
+    {
         ESP_LOGE(TAG, "Invalid arg or no memory");
     }
 

@@ -11,24 +11,26 @@
 #define __MQTT_H__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <esp_err.h>
 
-//--------------------------------- INCLUDES ----------------------------------
+   //--------------------------------- INCLUDES ----------------------------------
 
-//---------------------------------- MACROS -----------------------------------
+   //---------------------------------- MACROS -----------------------------------
 
-//-------------------------------- DATA TYPES ---------------------------------
+   //-------------------------------- DATA TYPES ---------------------------------
 
-//---------------------- PUBLIC FUNCTION PROTOTYPES --------------------------
+   //---------------------- PUBLIC FUNCTION PROTOTYPES --------------------------
 
-/**
- * @brief Initializes drivers and input drivers and starts task needed for MQTT operation.
- *
- */
-esp_err_t my_mqtt_init();
+   /**
+    * @brief Initializes drivers and input drivers and starts task needed for MQTT operation.
+    *
+    */
+   esp_err_t my_mqtt_init();
+   int is_mqtt_connected();
 
 #ifdef __cplusplus
 }
