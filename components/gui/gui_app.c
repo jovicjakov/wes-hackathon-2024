@@ -248,12 +248,12 @@ static void _wait_for_sensor_input_task(void *p_parameter)
 
         int switch_screen = 0;
         TempHumData packet;
-        if (temp_hum_to_gui_queue != NULL && (xQueueReceive(temp_to_gui_queue, &packet, 100 / portTICK_PERIOD_MS) == pdTRUE))
+        if (temp_hum_to_gui_queue != NULL && (xQueueReceive(temp_hum_to_gui_queue, &packet, 100 / portTICK_PERIOD_MS) == pdTRUE))
         {
             char temp[8];
-            snprintf(temp, 8, "%f", packet.temperature);
+            snprintf(temp, 8 + 1, "%f", packet.temperature);
             char hum[8];
-            snprintf(hum, 8, "%f", packet.humidity);
+            snprintf(hum, 8 + 1, "%f", packet.humidity);
             lv_table_set_cell_value(table, 1, 1, temp);
             lv_table_set_cell_value(table, 2, 1, hum);
         }

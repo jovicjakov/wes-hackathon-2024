@@ -56,8 +56,6 @@ static void mqtt_temp_hum_task(void *pvParameters);
 
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 
-static int mqtt_connected = 0;
-
 //------------------------------- GLOBAL DATA ---------------------------------
 esp_mqtt_client_handle_t client;
 int is_mqtt_connected_to_broker = false;
@@ -97,11 +95,6 @@ esp_err_t my_mqtt_init()
     mqtt5_app_start();
 
     return ESP_OK;
-}
-
-int is_mqtt_connected()
-{
-    return mqtt_connected == 0 ? 0 : 1;
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
