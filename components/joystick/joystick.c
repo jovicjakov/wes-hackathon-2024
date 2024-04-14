@@ -123,6 +123,7 @@ static void joystick_task(void *pvParameters) {
             inputHandler(INPUT_BACK_TO_CENTRE);
         }
     }
+    
 }
 
 /*---------------------------------------------------------------
