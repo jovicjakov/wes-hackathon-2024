@@ -55,13 +55,13 @@ static void temp_hum_sensor_task(void *pvParameters)
                 // Send data to the queue if it's not null
                 if (temperature_change_queue != NULL)
                 {
+                    if (temp_hum_to_gui_queue != NULL && (xQueueSend(temp_hum_to_gui_queue, &data, 0) != pdPASS))
+                    {
+                        ESP_LOGE(TAG, "Failed to send temperature and humidity to gui queue");
+                    }
                     if (xQueueSend(temperature_change_queue, &data, 0) != pdPASS)
                     {
                         // ESP_LOGE(TAG, "Failed to send temperature and humidity to queue");
-                        if (xQueueSend(temp_hum_to_gui_queue, &data, 0) != pdPASS)
-                        {
-                            // ESP_LOGE(TAG, "Failed to send temperature and humidity to gui queue");
-                        }
                     }
                     else
                     {
@@ -81,7 +81,7 @@ static void temp_hum_sensor_task(void *pvParameters)
             ESP_LOGE(TAG, "Failed to read temperature and humidity from sensor");
         }
         // Sleep for 10 seconds before the next reading
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        vTaskDelay(pdMS_TO_TICKS(2000));
     }
 }
 

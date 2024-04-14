@@ -17,6 +17,7 @@
 #include "freertos/queue.h"
 #include "freertos/portmacro.h"
 #include "esp_log.h"
+#include "tictactoe.h"
 
 /* Littlevgl specific */
 #include "lvgl.h"
@@ -24,6 +25,7 @@
 #include "lv_conf.h"
 #include "my_mqtt.h"
 #include "temp_hum_sensor.h"
+#include "time.h"
 //---------------------------------- MACROS -----------------------------------
 #define SCREEN_HEIGHT 240
 #define SCREEN_WIDTH 320
@@ -61,6 +63,7 @@ static void sensor_table_init(void);
 static const char *TAG = "GUI_APP";
 static const char *btnm_map[] = {" ", " ", " ", "\n", " ",
                                  " ", " ", "\n", " ", " ", " ", ""};
+static struct tm timeinfo;
 
 //------------------------------- GLOBAL DATA ---------------------------------
 // extern QueueHandle_t p_user_interface_queue;
@@ -73,13 +76,17 @@ lv_obj_t *temp_label;
 lv_obj_t *humidity_label;
 lv_obj_t *time_label;
 lv_obj_t *table;
+lv_obj_t *game_end_label;
 
 lv_obj_t *screen1;
 lv_obj_t *screen2;
 lv_obj_t *screen3;
+lv_obj_t *screen4;
+
 QueueHandle_t gui_queue = NULL;
+QueueHandle_t reset_queue = NULL;
 QueueHandle_t temp_hum_to_gui_queue = NULL;
-QueueHandle_t time_to_gui_queue = NULL;
+extern QueueHandle_t timeQueue;
 QueueHandle_t joystick_to_gui_queue = NULL;
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
@@ -89,15 +96,17 @@ void gui_app_init(void)
     screen1 = lv_obj_create(NULL);
     screen2 = lv_obj_create(NULL);
     screen3 = lv_obj_create(NULL);
+    screen4 = lv_obj_create(NULL);
     table = lv_table_create(screen3);
+    lv_obj_align(screen4, LV_ALIGN_CENTER, 0, 0);
     button_matrix_init();
     select_first_player_buttons_init();
     labels_init();
     sensor_table_init();
 
     gui_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(gui_app_event_t));
+    reset_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(tictactoe_gamestate_t));
     temp_hum_to_gui_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(gui_sensor_packet_t));
-    time_to_gui_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(gui_sensor_packet_t));
     joystick_to_gui_queue = xQueueCreate(GUI_QUEUE_SIZE, sizeof(gui_sensor_packet_t));
     if (gui_queue == NULL)
     {
@@ -150,6 +159,11 @@ static void button_matrix_init(void)
 
 static void labels_init()
 {
+    game_end_label = lv_label_create(screen4);
+    lv_obj_set_style_text_font(game_end_label, &lv_font_montserrat_14, 0);
+    lv_label_set_text(game_end_label, " ");
+    lv_obj_align_to(game_end_label, NULL, LV_ALIGN_CENTER, 0, 0);
+
     mqtt_connected_label = lv_label_create(screen2);
     lv_obj_set_style_text_font(mqtt_connected_label, &lv_font_montserrat_14, 0);
     lv_label_set_text(mqtt_connected_label, "Who do you want to play first Uranusborn?");
@@ -199,9 +213,9 @@ static void sensor_table_init()
     lv_table_set_cell_value(table, 0, 0, "Time");
     lv_table_set_cell_value(table, 1, 0, "Temperature");
     lv_table_set_cell_value(table, 2, 0, "Humidity");
-    lv_table_set_cell_value(table, 0, 1, "13:24");
-    lv_table_set_cell_value(table, 1, 1, "24 °C");
-    lv_table_set_cell_value(table, 2, 1, "mokro");
+    lv_table_set_cell_value(table, 0, 1, " ");
+    lv_table_set_cell_value(table, 1, 1, " ");
+    lv_table_set_cell_value(table, 2, 1, " ");
 }
 
 static void _button_event_handler(lv_event_t *p_event)
@@ -248,19 +262,26 @@ static void _wait_for_sensor_input_task(void *p_parameter)
 
         int switch_screen = 0;
         TempHumData packet;
+        tictactoe_gamestate_t end;
         if (temp_hum_to_gui_queue != NULL && (xQueueReceive(temp_hum_to_gui_queue, &packet, 100 / portTICK_PERIOD_MS) == pdTRUE))
         {
             char temp[8];
-            snprintf(temp, 8 + 1, "%f", packet.temperature);
+            char temp_tmp[10];
+            snprintf(temp, sizeof(temp) + 1, "%f", packet.temperature + 100);
+            sprintf(temp_tmp, "%c%c%c%c%c °C", temp[1], temp[2], temp[3], temp[4], temp[5]);
             char hum[8];
             snprintf(hum, 8 + 1, "%f", packet.humidity);
-            lv_table_set_cell_value(table, 1, 1, temp);
+            // ESP_LOGI(TAG, "~~~~~ RECIEVED TEMP [%c%c%c%c%c%c%c%c]", temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6], temp[7]);
+            lv_table_set_cell_value(table, 1, 1, temp_tmp);
             lv_table_set_cell_value(table, 2, 1, hum);
         }
-        // if (time_to_gui_queue != NULL && (xQueueReceive(temp_to_gui_queue, &packet, 100 / portTICK_PERIOD_MS) == pdTRUE))
-        // {
-        //     lv_table_set_cell_value(table, 1, 1, );
-        // }
+        if (timeQueue != NULL && (xQueueReceive(timeQueue, &timeinfo, 100 / portTICK_PERIOD_MS) == pdTRUE))
+        {
+
+            char time[6];
+            sprintf(time, "%d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
+            lv_table_set_cell_value(table, 0, 1, time);
+        }
         if (joystick_to_gui_queue != NULL && (xQueueReceive(joystick_to_gui_queue, &switch_screen, 200 / portTICK_PERIOD_MS) == pdTRUE))
         {
             if (switch_screen == 1 && (lv_disp_get_scr_act(NULL) == screen1))
@@ -271,6 +292,31 @@ static void _wait_for_sensor_input_task(void *p_parameter)
             {
                 lv_scr_load_anim(screen1, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 2 * FADE_IN_TIME, 0, false);
             }
+        }
+        if (reset_queue != NULL && (xQueueReceive(reset_queue, &end, 100 / portTICK_PERIOD_MS) == pdTRUE))
+        {
+
+            switch (end)
+            {
+            case WIN:
+                lv_label_set_text(game_end_label, "POWER TO URANUS!");
+                break;
+            case LOSS:
+                lv_label_set_text(game_end_label, "Earthlings won...");
+                break;
+            case DRAW:
+                lv_label_set_text(game_end_label, "Draw... I'll get you next time");
+                break;
+            default:
+                break;
+            }
+            lv_scr_load_anim(screen4, LV_SCR_LOAD_ANIM_FADE_IN, 3 * FADE_IN_TIME, 0, false);
+            for (int i = 0; i < 9; i++)
+            {
+                lv_label_set_text(p_labels[i], " ");
+            }
+
+            lv_scr_load_anim(screen2, LV_SCR_LOAD_ANIM_FADE_IN, 2 * FADE_IN_TIME, 5000 / portTICK_PERIOD_MS, false);
         }
     }
 }

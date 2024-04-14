@@ -40,6 +40,7 @@ void refresh_game_state();
 
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 static TaskHandle_t p_tictactoe_task = NULL;
+static int game_reset_mode = 0;
 static const char *TAG = "tictactoe";
 const int winning_combinations[8][3] = {
     {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Horizontal
@@ -55,10 +56,12 @@ QueueHandle_t p_tictactoe_queue_send = NULL;
 QueueHandle_t p_tictactoe_queue_rec = NULL;
 tictactoe_turn_t playerX = DEVICE;
 extern QueueHandle_t gui_queue;
+extern QueueHandle_t reset_queue;
 tictactoe_handler_t game;
 tictactoe_gamestate_t gamestate = IN_PROGRESS;
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
+void reset_game();
 esp_err_t tictactoe_init(void)
 {
 
@@ -95,12 +98,14 @@ static void tictactoe_first_move_task()
             playerX = SERVER;
             game.index_of_O[1] = 1;
             game.turn = SERVER;
+            game_reset_mode = 0;
             crtaj_xo(1, "o");
          }
          else if (gui_event == GUI_APP_EVENT_EARTHLING_FIRST_BUTTON_PRESSED)
          {
             playerX = SERVER;
             game.turn = SERVER;
+            game_reset_mode = 0;
          }
          else
          {
@@ -226,17 +231,33 @@ void refresh_game_state()
    switch (game_state)
    {
    case WIN:
+      reset_game();
       ESP_LOGW(TAG, "WE WON");
+      xQueueSend(reset_queue, &game_state, 0U);
       break;
    case LOSS:
+      reset_game();
       ESP_LOGW(TAG, "THE EARTHLINGS WON...");
+      xQueueSend(reset_queue, &game_state, 0U);
+
       break;
    case DRAW:
+      reset_game();
       ESP_LOGW(TAG, "ILL GET YOU NEXT TIME");
+      xQueueSend(reset_queue, &game_state, 0U);
+
       break;
    default:
       break;
    }
+}
+
+void reset_game()
+{
+   game_reset_mode = 1;
+   playerX = DEVICE;
+   memset(&game, 0, sizeof(game));
+   gamestate = IN_PROGRESS;
 }
 
 //---------------------------- INTERRUPT HANDLERS -----------------------------
