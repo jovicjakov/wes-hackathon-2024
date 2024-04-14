@@ -98,7 +98,7 @@ void gui_app_init(void)
     screen3 = lv_obj_create(NULL);
     screen4 = lv_obj_create(NULL);
     table = lv_table_create(screen3);
-    lv_obj_align(screen4, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(table, LV_ALIGN_CENTER, 0, 0);
     button_matrix_init();
     select_first_player_buttons_init();
     labels_init();
@@ -162,7 +162,7 @@ static void labels_init()
     game_end_label = lv_label_create(screen4);
     lv_obj_set_style_text_font(game_end_label, &lv_font_montserrat_14, 0);
     lv_label_set_text(game_end_label, " ");
-    lv_obj_align_to(game_end_label, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align_to(game_end_label, NULL, LV_ALIGN_CENTER, -3 * X_ALIGN, 0);
 
     mqtt_connected_label = lv_label_create(screen2);
     lv_obj_set_style_text_font(mqtt_connected_label, &lv_font_montserrat_14, 0);
@@ -306,7 +306,7 @@ static void _wait_for_sensor_input_task(void *p_parameter)
                 lv_label_set_text(game_end_label, "Earthlings won...");
                 break;
             case DRAW:
-                lv_label_set_text(game_end_label, "Draw... I'll get you next time");
+                lv_label_set_text(game_end_label, "Draw... Next time");
                 break;
             default:
                 break;
@@ -316,7 +316,7 @@ static void _wait_for_sensor_input_task(void *p_parameter)
             {
                 lv_label_set_text(p_labels[i], " ");
             }
-
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
             lv_scr_load_anim(screen2, LV_SCR_LOAD_ANIM_FADE_IN, 2 * FADE_IN_TIME, 5000 / portTICK_PERIOD_MS, false);
         }
     }

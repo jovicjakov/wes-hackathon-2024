@@ -149,7 +149,7 @@ static void _tictactoe_task(void *p_parameter)
    {
       tictactoe_handler_t tictactoe_event;
       /* Blockingly wait on an event. */
-      if ((p_tictactoe_queue_rec != NULL) && (xQueueReceive(p_tictactoe_queue_rec, &tictactoe_event, portMAX_DELAY) == pdTRUE))
+      if ((p_tictactoe_queue_rec != NULL) && (xQueueReceive(p_tictactoe_queue_rec, &tictactoe_event, portMAX_DELAY) == pdTRUE) && game_reset_mode == 0)
       {
          ESP_LOGI(TAG, "MQTT event received");
          game.turn = DEVICE;
