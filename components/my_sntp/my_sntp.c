@@ -6,22 +6,9 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-#include <string.h>
-#include <time.h>
-#include <sys/time.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "esp_attr.h"
-#include "esp_sleep.h"
-#include "nvs_flash.h"
-//#include "protocol_examples_common.h"
-#include "esp_sntp.h"
+#include "my_sntp.h"
 
-static const char *TAG = "example";
+static const char *TAG = "sntp";
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 48
@@ -35,6 +22,10 @@ RTC_DATA_ATTR static int boot_count = 0;
 
 static void obtain_time(void);
 static void initialize_sntp(void);
+
+static time_t now;
+static struct tm timeinfo;
+static char strftime_buf[64];
 
 #ifdef CONFIG_SNTP_TIME_SYNC_METHOD_CUSTOM
 void sntp_sync_time(struct timeval *tv)
@@ -50,13 +41,11 @@ void time_sync_notification_cb(struct timeval *tv)
     ESP_LOGI(TAG, "Notification of a time synchronization event");
 }
 
-void app_main(void)
+void sntp_app_main(void)
 {
     ++boot_count;
     ESP_LOGI(TAG, "Boot count: %d", boot_count);
 
-    time_t now;
-    struct tm timeinfo;
     time(&now);
     localtime_r(&now, &timeinfo);
     // Is time set? If not, tm_year will be (1970 - 1900).
@@ -66,65 +55,53 @@ void app_main(void)
         // update 'now' variable with current time
         time(&now);
     }
-#ifdef CONFIG_SNTP_TIME_SYNC_METHOD_SMOOTH
-    else {
-        // add 500 ms error to the current system time.
-        // Only to demonstrate a work of adjusting method!
-        {
-            ESP_LOGI(TAG, "Add a error for test adjtime");
-            struct timeval tv_now;
-            gettimeofday(&tv_now, NULL);
-            int64_t cpu_time = (int64_t)tv_now.tv_sec * 1000000L + (int64_t)tv_now.tv_usec;
-            int64_t error_time = cpu_time + 500 * 1000L;
-            struct timeval tv_error = { .tv_sec = error_time / 1000000L, .tv_usec = error_time % 1000000L };
-            settimeofday(&tv_error, NULL);
-        }
-
-        ESP_LOGI(TAG, "Time was set, now just adjusting it. Use SMOOTH SYNC method.");
-        obtain_time();
-        // update 'now' variable with current time
-        time(&now);
-    }
-#endif
-
-    char strftime_buf[64];
 
     // Set timezone to Eastern Standard Time and print local time
-    setenv("TZ", "EST5EDT,M3.2.0/2,M11.1.0", 1);
+    setenv("TZ", "GMT-2", 1);
     tzset();
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    ESP_LOGI(TAG, "The current date/time in New York is: %s", strftime_buf);
+    ESP_LOGI(TAG, "The current date/time in Zagreb is: %s", strftime_buf);
+}
 
-    // Set timezone to China Standard Time
-    setenv("TZ", "CST-8", 1);
-    tzset();
+static void updateTime(void) {
+    time(&now);
     localtime_r(&now, &timeinfo);
-    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    ESP_LOGI(TAG, "The current date/time in Shanghai is: %s", strftime_buf);
-
-    if (sntp_get_sync_mode() == SNTP_SYNC_MODE_SMOOTH) {
-        struct timeval outdelta;
-        while (sntp_get_sync_status() == SNTP_SYNC_STATUS_IN_PROGRESS) {
-            adjtime(NULL, &outdelta);
-            ESP_LOGI(TAG, "Waiting for adjusting time ... outdelta = %jd sec: %li ms: %li us",
-                        (intmax_t)outdelta.tv_sec,
-                        outdelta.tv_usec/1000,
-                        outdelta.tv_usec%1000);
-            vTaskDelay(2000 / portTICK_PERIOD_MS);
-        }
+    if (timeinfo.tm_year < (2016 - 1900)) {
+        ESP_LOGI(TAG, "Time is not set yet. Connecting to WiFi and getting time over NTP.");
+        obtain_time();
+        time(&now);
     }
+    // Set timezone to Zagreb time and print it
+    setenv("TZ", "GMT-2", 1);
+    tzset();
+    localtime_r(&now, &timeinfo);
+    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+}
 
-    const int deep_sleep_sec = 10;
-    ESP_LOGI(TAG, "Entering deep sleep for %d seconds", deep_sleep_sec);
-    esp_deep_sleep(1000000LL * deep_sleep_sec);
+currentTimeInfo ret;
+currentTimeInfo *fetchTime() {
+    updateTime();
+    ret.hour = timeinfo.tm_hour;
+    ret.min = timeinfo.tm_min;
+    ret.sec = timeinfo.tm_sec;
+    ret.day = timeinfo.tm_mday;
+    ret.weekDay = timeinfo.tm_wday;
+    ret.month = timeinfo.tm_mon+1;
+    ret.year = timeinfo.tm_year+1900;
+
+    return &ret;
 }
 
 static void obtain_time(void)
 {
+    ESP_LOGI(TAG, "1111111111111111111111111111111111111111111111111111111");
     ESP_ERROR_CHECK( nvs_flash_init() );
+    ESP_LOGI(TAG, "2222222222222222222222222222222222222222222222222222222");
     ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK( esp_event_loop_create_default() );
+    ESP_LOGI(TAG, "3333333333333333333333333333333333333333333333333333333");
+    //ESP_ERROR_CHECK( esp_event_loop_create_default() );
+    ESP_LOGI(TAG, "4444444444444444444444444444444444444444444444444444444");
 
     /**
      * NTP server address could be aquired via DHCP,
@@ -143,7 +120,8 @@ static void obtain_time(void)
      * Read "Establishing Wi-Fi or Ethernet Connection" section in
      * examples/protocols/README.md for more information about this function.
      */
-    ESP_ERROR_CHECK(example_connect());
+    //ESP_ERROR_CHECK(example_connect());
+    ESP_LOGI(TAG, "555555555555555555555555555555555555555555555555555555");
 
     initialize_sntp();
 
@@ -159,7 +137,7 @@ static void obtain_time(void)
     time(&now);
     localtime_r(&now, &timeinfo);
 
-    ESP_ERROR_CHECK( example_disconnect() );
+    //ESP_ERROR_CHECK( example_disconnect() );
 }
 
 static void initialize_sntp(void)
@@ -184,7 +162,7 @@ static void initialize_sntp(void)
 
 #else   /* LWIP_DHCP_GET_NTP_SRV && (SNTP_MAX_SERVERS > 1) */
     // otherwise, use DNS address from a pool
-    esp_sntp_setservername(0, CONFIG_SNTP_TIME_SERVER);
+    esp_sntp_setservername(0, "time.windows.com");
 
     esp_sntp_setservername(1, "pool.ntp.org");     // set the secondary NTP server (will be used only if SNTP_MAX_SERVERS > 1)
 #endif

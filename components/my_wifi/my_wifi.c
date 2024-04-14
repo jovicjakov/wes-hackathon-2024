@@ -7,7 +7,7 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include "wifi.h"
+#include "my_wifi.h"
 
 /* The examples use WiFi configuration that you can set via project configuration menu
 

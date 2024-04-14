@@ -14,7 +14,8 @@
 #include "gui.h"
 #include "joystick.h"
 #include "temp_sensor.h"
-#include "wifi.h"
+#include "my_sntp.h"
+#include "my_wifi.h"
 #include "gui_app.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -50,6 +51,15 @@ void user_interface_init(void)
     //joystick_init();
     //joystick_startReadingStates();
     wifi_main();
+    sntp_app_main();
+
+    currentTimeInfo *timeInfo = fetchTime();
+    ESP_LOGI(TAG, "Hours: %d", timeInfo->hour);
+    ESP_LOGI(TAG, "Minutes: %d", timeInfo->min);
+    ESP_LOGI(TAG, "Seconds: %d", timeInfo->sec);
+    ESP_LOGI(TAG, "Day: %d", timeInfo->day);
+    ESP_LOGI(TAG, "Month: %d", timeInfo->month);
+    ESP_LOGI(TAG, "Year: %d", timeInfo->year);
 
     p_user_interface_queue = xQueueCreate(USER_INTERFACE_QUEUE_SIZE, sizeof(gui_app_event_t));
     if(p_user_interface_queue == NULL)

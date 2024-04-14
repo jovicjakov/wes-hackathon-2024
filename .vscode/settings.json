@@ -3,6 +3,8 @@
     "files.associations": {
         "temp_sensor.h": "c",
         "string.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "random": "c",
+        "limits": "c"
     }
 }
