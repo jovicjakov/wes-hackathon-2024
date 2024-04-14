@@ -2,6 +2,7 @@
 #define BUZZER_H
 
 #include "driver/ledc.h"
+#include "esp_err.h"
 
 // Define GPIO pin for the buzzer
 #define BUZZER_GPIO 18
@@ -18,7 +19,7 @@
 #define PAUSE_BETWEEN_LETTERS 300 // Pause between each letter in milliseconds
 
 // Function to initialize PWM
-void init_pwm();
+esp_err_t init_pwm();
 
 // Function to control the buzzer
 void buzzer_control(int duty_cycle);

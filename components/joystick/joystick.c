@@ -15,7 +15,9 @@
 #include "driver/gpio.h"
 #include "sdkconfig.h"
 
-static const char *TAG = "joystick";
+#define TAG "joystick"
+#define TASK_STACK_SIZE 2048
+#define TASK_PRIORITY 10
 
 #if CONFIG_IDF_TARGET_ESP32
 #define EXAMPLE_ADC1_CHAN0 ADC_CHANNEL_6
@@ -24,13 +26,8 @@ static const char *TAG = "joystick";
 #endif
 
 static int adc_raw[2];
-static int voltage[2];
-static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle);
-static void example_adc_calibration_deinit(adc_cali_handle_t handle);
-
-static void joystick_task(void *pvParameters);
-
-adc_oneshot_unit_handle_t adc1_handle;
+static adc_oneshot_unit_handle_t adc1_handle;
+static TaskHandle_t joystick_task_handle = NULL;
 
 enum inputs {
     INPUT_PUSH_BUTTON,
@@ -41,16 +38,18 @@ enum inputs {
     INPUT_BACK_TO_CENTRE
 };
 
-void joystick_init(void)
-{
+// Forward declarations for calibration functions
+static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle);
+static void example_adc_calibration_deinit(adc_cali_handle_t handle);
 
-    //-------------ADC1 Init---------------//
-    adc_oneshot_unit_init_cfg_t init_config1 = {
-        .unit_id = ADC_UNIT_1,
-    };
+static void joystick_task(void *pvParameters);
+void joystick_init(void);
+void inputHandler(int input);
+
+void joystick_init(void) {
+    adc_oneshot_unit_init_cfg_t init_config1 = {.unit_id = ADC_UNIT_1};
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
 
-    //-------------ADC1 Config---------------//
     adc_oneshot_chan_cfg_t config = {
         .bitwidth = ADC_BITWIDTH_DEFAULT,
         .atten = EXAMPLE_ADC_ATTEN,
@@ -58,13 +57,13 @@ void joystick_init(void)
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, EXAMPLE_ADC1_CHAN0, &config));
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, EXAMPLE_ADC1_CHAN1, &config));
 
-    //-------------ADC1 Calibration Init---------------//
-    adc_cali_handle_t adc1_cali_chan0_handle = NULL;
-    adc_cali_handle_t adc1_cali_chan1_handle = NULL;
-    bool do_calibration1_chan0 = example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN0, EXAMPLE_ADC_ATTEN, &adc1_cali_chan0_handle);
-    bool do_calibration1_chan1 = example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN1, EXAMPLE_ADC_ATTEN, &adc1_cali_chan1_handle);
+    adc_cali_handle_t adc1_cali_chan0_handle = NULL, adc1_cali_chan1_handle = NULL;
+    bool calibrated_chan0 = example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN0, EXAMPLE_ADC_ATTEN, &adc1_cali_chan0_handle);
+    bool calibrated_chan1 = example_adc_calibration_init(ADC_UNIT_1, EXAMPLE_ADC1_CHAN1, EXAMPLE_ADC_ATTEN, &adc1_cali_chan1_handle);
 
-    xTaskCreate(joystick_task, "joystick_task", 2048, NULL, 10, NULL);
+    if (joystick_task_handle == NULL) {
+        xTaskCreate(joystick_task, "joystick_task", TASK_STACK_SIZE, NULL, TASK_PRIORITY, &joystick_task_handle);
+    }
 }
 
 void inputHandler(int input) {
@@ -90,37 +89,34 @@ void inputHandler(int input) {
 }
 
 static void joystick_task(void *pvParameters) {
-    for(;;) {
+    while (true) {
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
 
-        if(adc_raw[0] <= 1000) {
+        if (adc_raw[0] <= 1000) {
             inputHandler(INPUT_RIGHT_ARROW);
-            while(adc_raw[0] < 1500) {
+            while (adc_raw[0] < 1500) {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
                 vTaskDelay(pdMS_TO_TICKS(50));
             }
             inputHandler(INPUT_BACK_TO_CENTRE);
-        }
-        else if(adc_raw[0] >= 3500) {
+        } else if (adc_raw[0] >= 3500) {
             inputHandler(INPUT_LEFT_ARROW);
-            while(adc_raw[0] < 1500 || adc_raw[0] > 2500) {
+            while (adc_raw[0] < 1500 || adc_raw[0] > 2500) {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
                 vTaskDelay(pdMS_TO_TICKS(50));
             }
             inputHandler(INPUT_BACK_TO_CENTRE);
-        }
-        else if(adc_raw[1] <= 500) {
+        } else if (adc_raw[1] <= 500) {
             inputHandler(INPUT_UP_ARROW);
-            while(adc_raw[1] < 1500 || adc_raw[1] > 2500) {
+            while (adc_raw[1] < 1500 || adc_raw[1] > 2500) {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
                 vTaskDelay(pdMS_TO_TICKS(50));
             }
             inputHandler(INPUT_BACK_TO_CENTRE);
-        }
-        else if(adc_raw[1] >= 4000) {
+        } else if (adc_raw[1] >= 4000) {
             inputHandler(INPUT_DOWN_ARROW);
-            while(adc_raw[1] < 1500 || adc_raw[1] > 2500) {
+            while (adc_raw[1] < 1500 || adc_raw[1] > 2500) {
                 ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
                 vTaskDelay(pdMS_TO_TICKS(50));
             }

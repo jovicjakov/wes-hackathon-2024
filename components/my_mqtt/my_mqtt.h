@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+#include <esp_err.h>
+
 //--------------------------------- INCLUDES ----------------------------------
 
 //---------------------------------- MACROS -----------------------------------
@@ -26,7 +28,7 @@ extern "C" {
  * @brief Initializes drivers and input drivers and starts task needed for MQTT operation.
  *
  */
-void my_mqtt_init(void);
+esp_err_t my_mqtt_init();
 
 #ifdef __cplusplus
 }

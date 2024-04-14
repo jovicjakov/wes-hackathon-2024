@@ -38,26 +38,67 @@ static const char *TAG = "MAIN";
 //------------------------------- GLOBAL DATA ---------------------------------
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
+void app_init(void) {
+    esp_err_t ret;
+
+    // Initialize Tic-Tac-Toe
+    ret = tictactoe_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize Tic-Tac-Toe: %s", esp_err_to_name(ret));
+    }
+
+    // Initialize Temperature Sensor
+    ret = temp_sensor_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize temperature sensor: %s", esp_err_to_name(ret));
+    }
+
+    // Initialize MQTT
+    ret = my_mqtt_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize MQTT: %s", esp_err_to_name(ret));
+    }
+
+    // Initialize Button
+    ret = _button_init(GPIO_BUTTON_1);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize button: %s", esp_err_to_name(ret));
+    }
+
+    // Initialize Morse code module
+    ret = morse_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize Morse: %s", esp_err_to_name(ret));
+    }
+
+    // Initialize LEDs
+    ret = led_init(LED_BLUE);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize blue LED: %s", esp_err_to_name(ret));
+    }
+
+    ret = led_init(LED_RED);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize red LED: %s", esp_err_to_name(ret));
+    }
+
+    // Initialize PWM
+    ret = init_pwm();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize PWM: %s", esp_err_to_name(ret));
+    }
+
+    // Initialize Joystick
+    // ret = joystick_init();
+    // if (ret != ESP_OK) {
+    //     ESP_LOGE(TAG, "Failed to initialize joystick: %s", esp_err_to_name(ret));
+    //     // Handle critical error or retry logic
+    // }
+}
+
 void app_main(void)
 {
-   
-
-   (void) _button_init (GPIO_BUTTON_1);
-   morse_init ();
-   led_init(LED_BLUE);
-   led_init (LED_RED);
-   //buzzer_init ();
-   //buzzer_start();
-   init_pwm ();
-
-   tictactoe_init();
-   esp_err_t err = temp_sensor_init();
-   if (err != ESP_OK) ESP_LOGI(TAG, "temp/hum sensor init failed");
-
-   my_mqtt_init();
-
-   joystick_init();
-
+   app_init();
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------

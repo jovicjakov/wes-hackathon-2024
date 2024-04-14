@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "esp_err.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/ledc.h"
@@ -13,7 +14,7 @@
 #define PWM_RESOLUTION LEDC_TIMER_13_BIT
 
 // Function to initialize PWM
-void init_pwm() {
+esp_err_t init_pwm() {
     ledc_timer_config_t ledc_timer = {
         .duty_resolution = PWM_RESOLUTION,
         .freq_hz = PWM_FREQ_HZ,
@@ -29,7 +30,9 @@ void init_pwm() {
         .speed_mode = PWM_MODE,
         .timer_sel  = LEDC_TIMER_0
     };
-    ledc_channel_config(&ledc_channel);
+    esp_err_t ret = ledc_channel_config(&ledc_channel);
+
+    return ret;
 }
 
 // Function to control the buzzer

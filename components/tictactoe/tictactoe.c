@@ -10,6 +10,7 @@
 
 //--------------------------------- INCLUDES ----------------------------------
 
+#include "esp_err.h"
 #include "freertos/portmacro.h"
 #include "gui_app.h"
 #include "gui.h"
@@ -44,7 +45,7 @@ extern QueueHandle_t gui_queue;
 tictactoe_handler_t game;
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
-void tictactoe_init(void)
+esp_err_t tictactoe_init(void)
 {
 
    gui_init();
@@ -53,15 +54,17 @@ void tictactoe_init(void)
    if (p_tictactoe_queue_send == NULL)
    {
       printf("User interface queue was not initialized successfully\n");
-      return;
+      return ESP_FAIL;
    }
    memset(&game, 0, sizeof(game));
    TaskHandle_t p_tictactoe_first_move_task = NULL;
    if (pdPASS != xTaskCreate(&tictactoe_first_move_task, "tictactoe_first_move_task", 2 * 1024, NULL, 5, &p_tictactoe_first_move_task))
    {
       printf("tictactoe_first_move_task was not initialized successfully\n");
-      return;
+      return ESP_FAIL;
    }
+
+   return ESP_OK;
 }
 
 static void tictactoe_first_move_task()

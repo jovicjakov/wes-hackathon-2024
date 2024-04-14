@@ -34,6 +34,7 @@
 #include "temp_hum_sensor.h"
 #include <math.h>
 #include "tictactoe.h"
+#include "led.h"
 
 //---------------------------------- MACROS -----------------------------------
 #define DELAY_TIME_MS (1000U)
@@ -50,18 +51,23 @@ static void _create_demo_application(void);
 static const char *TAG = "MY_MQTT";
 
 static void mqtt5_app_start(void);
-static void my_mqtt_task(void *pvParameters);
+static void mqtt_tictactoe_task(void *pvParameters);
+static void mqtt_temp_hum_task(void *pvParameters);
+
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 
 //------------------------------- GLOBAL DATA ---------------------------------
 esp_mqtt_client_handle_t client;
 extern QueueHandle_t p_tictactoe_queue_send;
 extern QueueHandle_t p_tictactoe_queue_rec;
+extern QueueHandle_t temperature_change_queue;
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
-void my_mqtt_init()
+esp_err_t my_mqtt_init()
 {
-    xTaskCreate(my_mqtt_task, "MQTT Publish Task", 2048, NULL, 10, NULL);
+    // Start MQTT tasks for Tic-Tac-Toe and Temperature/Humidity
+    xTaskCreate(mqtt_tictactoe_task, "MQTT_TicTacToe_Task", 2048, NULL, 10, NULL);
+    xTaskCreate(mqtt_temp_hum_task, "MQTT_TempHum_Task", 4096, NULL, 10, NULL);
 
     ESP_LOGI(TAG, "[APP] Startup..");
     ESP_LOGI(TAG, "[APP] Free memory: %" PRIu32 " bytes", esp_get_free_heap_size());
@@ -86,16 +92,18 @@ void my_mqtt_init()
     ESP_ERROR_CHECK(example_connect());
 
     mqtt5_app_start();
+
+    return ESP_OK;
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
-static char *create_json_payload(void)
+static char *create_json_payload_sens(TempHumData data)
 {
     // Create the root object to hold the data
     cJSON *root = cJSON_CreateObject();
 
-    float temp = floorf(floorf(getTemperature() * 100) / 100);
-    float hum = floorf(floorf(getHumidity() * 100) / 100);
+    float temp = floorf(floorf(data.temperature * 100) / 100);
+    float hum = floorf(floorf(data.humidity * 100) / 100);
 
     // Add temperature and humidity directly to the root object
     cJSON_AddNumberToObject(root, "temp", temp);
@@ -111,7 +119,7 @@ static char *create_json_payload(void)
     // Serialize the JSON object to a string
     char *formatted_json = cJSON_Print(root);
 
-    ESP_LOGI(TAG, "%s", formatted_json);
+    //ESP_LOGI(TAG, "%s", formatted_json);
 
     // Clean up and free memory
     cJSON_Delete(root);
@@ -185,13 +193,6 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
 
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        //char *json_payload = create_json_payload();
-
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
-        // ESP_LOGI(TAG, "Publishing to topic WES/Uranus/sensors on INIT");
-        // esp_mqtt_client_publish(client, "WES/Uranus/sensors", json_payload, 0, 1, 0);
-
-        // free(json_payload);
         esp_mqtt_client_subscribe(client, "WES/Uranus/game", 0);
         ESP_LOGI(TAG, "Subscribed to topic WES/Uranus/game !");
         break;
@@ -212,8 +213,8 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
         break;
 
     case MQTT_EVENT_DATA:
-        ESP_LOGI(TAG, "MQTT_EVENT_DATA Received");
-        printf("Received: Topic=%.*s, Data=%.*s\n", event->topic_len, event->topic, event->data_len, event->data);
+        //ESP_LOGI(TAG, "MQTT_EVENT_DATA Received");
+        //printf("Received: Topic=%.*s, Data=%.*s\n", event->topic_len, event->topic, event->data_len, event->data);
 
         // Parse the JSON payload from the received data
         cJSON *root = cJSON_ParseWithLength(event->data, event->data_len);
@@ -330,32 +331,44 @@ static void mqtt5_app_start(void)
     esp_mqtt_client_start(client);
 }
 
-static void my_mqtt_task(void *pvParameters)
-{
-    char *msg;
+static void mqtt_tictactoe_task(void *pvParameters) {
     tictactoe_handler_t tictactoe_msg;
-
-    for (;;)
-    {
-        // if(xQueueReceive(temp_queue, &msg, portMAX_DELAY) == pdPASS) {
-        //  Temp threshold reached, publish it
-        // ESP_LOGI(TAG, "Motion detected, publishing to MQTT");
-        // esp_mqtt_client_publish("your/mqtt/topic", msg, 0, 0); // Adjust topic, QoS, retain as needed
-        //}
-
-        if (xQueueReceive(p_tictactoe_queue_send, &tictactoe_msg, portMAX_DELAY) == pdPASS)
-        {
-            ESP_LOGI(TAG, "Publishing move!");
+    for (;;) {
+        if (xQueueReceive(p_tictactoe_queue_send, &tictactoe_msg, portMAX_DELAY) == pdPASS) {
+            ESP_LOGI(TAG, "Publishing game move!");
             char *json_payload = create_json_payload_game(&tictactoe_msg);
-            if (json_payload != NULL)   
-            {
-                ESP_LOGI(TAG, "%s", json_payload);
+            if (json_payload != NULL) {
                 esp_mqtt_client_publish(client, "WES/Uranus/game", json_payload, 0, 1, 0);
-                free(json_payload); // Free the JSON string after publishing it
-            }
-            else
-            {
+                free(json_payload);
+            } else {
                 ESP_LOGE(TAG, "Failed to create JSON payload");
+            }
+        }
+    }
+}
+
+static void mqtt_temp_hum_task(void *pvParameters) {
+    TempHumData temp_hum_data;
+    for (;;) {
+        if (xQueueReceive(temperature_change_queue, &temp_hum_data, portMAX_DELAY) == pdPASS) {
+            ESP_LOGI(TAG, "Publishing Temp: %.2f°C, Humi: %.2f%% to WES/Uranus/sensors!", temp_hum_data.temperature, temp_hum_data.humidity);
+            // LED pattern indicating the data is being prepared for sending
+            led_on(LED_BLUE);
+            vTaskDelay(pdMS_TO_TICKS(800));
+            led_off(LED_BLUE);
+            vTaskDelay(pdMS_TO_TICKS(200));
+            led_on(LED_BLUE);
+            vTaskDelay(pdMS_TO_TICKS(800));
+            led_off(LED_BLUE);
+
+            char *json_payload = NULL;
+            json_payload = create_json_payload_sens(temp_hum_data);
+            int pub_fail = esp_mqtt_client_publish(client, "WES/Uranus/sensors", json_payload, 0, 1, 0);
+            if (pub_fail == -1) {
+                ESP_LOGE(TAG, "FAILED to publish temperature and humidity data to WES/Uranus/sensors!");
+                led_on(LED_RED);   // Failure: RED light long blink
+                vTaskDelay(pdMS_TO_TICKS(800));
+                led_off(LED_RED);
             }
         }
     }

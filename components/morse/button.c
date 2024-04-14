@@ -1,4 +1,5 @@
 #include "inc/button.h"
+#include "esp_err.h"
 #include "hal/gpio_types.h"
 #include <esp_log.h>
 #include "esp_timer.h"
@@ -77,7 +78,7 @@ esp_err_t _button_init(uint8_t pin)
 }
 
 //------------------------------ PUBLIC FUNCTIONS -----------------------------
-void morse_init(void)
+esp_err_t morse_init(void)
 {
     p_morse_queue = xQueueCreate(MORSE_QUEUE_SIZE, sizeof(int));
     p_led_queue = xQueueCreate (LED_QUEUE_SIZE, sizeof (int));
@@ -86,19 +87,21 @@ void morse_init(void)
     if(p_morse_queue == NULL && p_led_queue == NULL)
     {
         ESP_LOGI(TAG, "Morse queue was not initialized successfully\n");
-        return;
+        return ESP_FAIL;
     }
 
     if(pdPASS != xTaskCreate(&_morse_task, "morse_task", 2 * 1024, NULL, 5, &morse_task_handle))
     {
         ESP_LOGI(TAG, "Morse task was not initialized successfully\n");
-        return;
+        return ESP_FAIL;
     }
     
     if (pdPASS != xTaskCreate(&_led_task, "led_task", 2 * 1024, NULL, 5, &led_task_handle)) {
         ESP_LOGI(TAG, "Led task was not initialized successfully\n");
-        return;
+        return ESP_FAIL;
     }
+
+    return ESP_OK;
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
@@ -145,9 +148,9 @@ static void send_sos_ticks (){
 }
 static void sos_signalisation () {
     printf("LED RED");
-    led_on (LED_RED);
+    led_on (LED_BLUE);
     vTaskDelay(pdMS_TO_TICKS(800));
-    led_off (LED_RED);
+    led_off (LED_BLUE);
     vTaskDelay(pdMS_TO_TICKS(200));
 }
 

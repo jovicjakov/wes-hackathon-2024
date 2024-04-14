@@ -15,4 +15,4 @@ typedef struct
    tictactoe_turn_t turn;
 } tictactoe_handler_t;
 
-void tictactoe_init(void);
+esp_err_t tictactoe_init(void);
