@@ -129,7 +129,7 @@ static void tictactoe_first_move_task()
          }
          if (pdPASS != xTaskCreate(&_tictactoe_task, "tictactoe_task", 2 * 1024, NULL, 5, &p_tictactoe_task))
          {
-            printf("User interface task was not initialized successfully\n");
+            printf("TICTACTOE task was not initialized successfully\n");
          }
       }
    }

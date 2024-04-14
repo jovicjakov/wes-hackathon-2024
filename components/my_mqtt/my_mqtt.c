@@ -60,6 +60,7 @@ static int mqtt_connected = 0;
 
 //------------------------------- GLOBAL DATA ---------------------------------
 esp_mqtt_client_handle_t client;
+int is_mqtt_connected_to_broker = false;
 extern QueueHandle_t p_tictactoe_queue_send;
 extern QueueHandle_t p_tictactoe_queue_rec;
 extern QueueHandle_t temperature_change_queue;
@@ -98,7 +99,7 @@ esp_err_t my_mqtt_init()
     return ESP_OK;
 }
 
-int is_mqtt_connected() 
+int is_mqtt_connected()
 {
     return mqtt_connected == 0 ? 0 : 1;
 }
@@ -126,7 +127,7 @@ static char *create_json_payload_sens(TempHumData data)
     // Serialize the JSON object to a string
     char *formatted_json = cJSON_Print(root);
 
-    //ESP_LOGI(TAG, "%s", formatted_json);
+    // ESP_LOGI(TAG, "%s", formatted_json);
 
     // Clean up and free memory
     cJSON_Delete(root);
@@ -205,7 +206,7 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
         esp_mqtt_client_subscribe(client, "WES/Uranus/game", 0);
         ESP_LOGI(TAG, "Subscribed to topic WES/Uranus/game !");
-        mqtt_connected = 1;
+        is_mqtt_connected_to_broker = true;
         break;
 
     case MQTT_EVENT_DISCONNECTED:
@@ -343,26 +344,35 @@ static void mqtt5_app_start(void)
     esp_mqtt_client_start(client);
 }
 
-static void mqtt_tictactoe_task(void *pvParameters) {
+static void mqtt_tictactoe_task(void *pvParameters)
+{
     tictactoe_handler_t tictactoe_msg;
-    for (;;) {
-        if (xQueueReceive(p_tictactoe_queue_send, &tictactoe_msg, portMAX_DELAY) == pdPASS) {
+    for (;;)
+    {
+        if (xQueueReceive(p_tictactoe_queue_send, &tictactoe_msg, portMAX_DELAY) == pdPASS)
+        {
             ESP_LOGI(TAG, "Publishing game move!");
             char *json_payload = create_json_payload_game(&tictactoe_msg);
-            if (json_payload != NULL) {
+            if (json_payload != NULL)
+            {
                 esp_mqtt_client_publish(client, "WES/Uranus/game", json_payload, 0, 1, 0);
                 free(json_payload);
-            } else {
+            }
+            else
+            {
                 ESP_LOGE(TAG, "Failed to create JSON payload");
             }
         }
     }
 }
 
-static void mqtt_temp_hum_task(void *pvParameters) {
+static void mqtt_temp_hum_task(void *pvParameters)
+{
     TempHumData temp_hum_data;
-    for (;;) {
-        if (xQueueReceive(temperature_change_queue, &temp_hum_data, portMAX_DELAY) == pdPASS) {
+    for (;;)
+    {
+        if (xQueueReceive(temperature_change_queue, &temp_hum_data, portMAX_DELAY) == pdPASS)
+        {
             ESP_LOGI(TAG, "Publishing Temp: %.2f°C, Humi: %.2f%% to WES/Uranus/sensors!", temp_hum_data.temperature, temp_hum_data.humidity);
             // LED pattern indicating the data is being prepared for sending
             led_on(LED_RED);
@@ -376,14 +386,20 @@ static void mqtt_temp_hum_task(void *pvParameters) {
             char *json_payload = NULL;
             json_payload = create_json_payload_sens(temp_hum_data);
             int pub_fail = esp_mqtt_client_publish(client, "WES/Uranus/sensors", json_payload, 0, 1, 0);
-            if (pub_fail == -1) {
+            if (pub_fail == -1)
+            {
                 ESP_LOGE(TAG, "FAILED to publish temperature and humidity data to WES/Uranus/sensors!");
-                led_on(LED_RED);   // Failure: RED light long blink
+                led_on(LED_RED); // Failure: RED light long blink
                 vTaskDelay(pdMS_TO_TICKS(800));
                 led_off(LED_RED);
             }
         }
     }
+}
+
+int is_mqtt_connected()
+{
+    return is_mqtt_connected_to_broker;
 }
 
 //---------------------------- INTERRUPT HANDLERS -----------------------------
