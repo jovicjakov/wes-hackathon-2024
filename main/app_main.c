@@ -25,6 +25,7 @@
 #include "../components/buzzer/buzzer.h"
 #include "driver/gpio.h"
 #include "user_interface.h"
+#include "lis2dh12/lis2dh12.h"
 
 //---------------------------------- MACROS -----------------------------------
 #define BUZZER_PIN GPIO_NUM_26
@@ -52,6 +53,13 @@ void app_init(void) {
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to initialize temperature sensor: %s", esp_err_to_name(ret));
     }
+
+   // Initialize PWM
+    ret = lis_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize PWM: %s", esp_err_to_name(ret));
+    }
+
 
     // Initialize MQTT
     ret = my_mqtt_init();

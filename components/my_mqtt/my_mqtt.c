@@ -196,16 +196,6 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
 
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-<<<<<<< HEAD
-=======
-        // char *json_payload = create_json_payload();
-
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
-        // ESP_LOGI(TAG, "Publishing to topic WES/Uranus/sensors on INIT");
-        // esp_mqtt_client_publish(client, "WES/Uranus/sensors", json_payload, 0, 1, 0);
-
-        // free(json_payload);
->>>>>>> majda
         esp_mqtt_client_subscribe(client, "WES/Uranus/game", 0);
         ESP_LOGI(TAG, "Subscribed to topic WES/Uranus/game !");
         break;
@@ -226,13 +216,8 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
         break;
 
     case MQTT_EVENT_DATA:
-<<<<<<< HEAD
-        //ESP_LOGI(TAG, "MQTT_EVENT_DATA Received");
-        //printf("Received: Topic=%.*s, Data=%.*s\n", event->topic_len, event->topic, event->data_len, event->data);
-=======
 
         printf("Data: Topic=%.*s, Data=%.*s\n", event->topic_len, event->topic, event->data_len, event->data);
->>>>>>> majda
 
         // Parse the JSON payload from the received data
         cJSON *root = cJSON_ParseWithLength(event->data, event->data_len);
@@ -356,13 +341,7 @@ static void mqtt_tictactoe_task(void *pvParameters) {
         if (xQueueReceive(p_tictactoe_queue_send, &tictactoe_msg, portMAX_DELAY) == pdPASS) {
             ESP_LOGI(TAG, "Publishing game move!");
             char *json_payload = create_json_payload_game(&tictactoe_msg);
-<<<<<<< HEAD
             if (json_payload != NULL) {
-=======
-            if (json_payload != NULL)
-            {
-                ESP_LOGI(TAG, "%s", json_payload);
->>>>>>> majda
                 esp_mqtt_client_publish(client, "WES/Uranus/game", json_payload, 0, 1, 0);
                 free(json_payload);
             } else {
@@ -378,13 +357,13 @@ static void mqtt_temp_hum_task(void *pvParameters) {
         if (xQueueReceive(temperature_change_queue, &temp_hum_data, portMAX_DELAY) == pdPASS) {
             ESP_LOGI(TAG, "Publishing Temp: %.2f°C, Humi: %.2f%% to WES/Uranus/sensors!", temp_hum_data.temperature, temp_hum_data.humidity);
             // LED pattern indicating the data is being prepared for sending
-            led_on(LED_BLUE);
+            led_on(LED_RED);
             vTaskDelay(pdMS_TO_TICKS(800));
-            led_off(LED_BLUE);
+            led_off(LED_RED);
             vTaskDelay(pdMS_TO_TICKS(200));
-            led_on(LED_BLUE);
+            led_on(LED_RED);
             vTaskDelay(pdMS_TO_TICKS(800));
-            led_off(LED_BLUE);
+            led_off(LED_RED);
 
             char *json_payload = NULL;
             json_payload = create_json_payload_sens(temp_hum_data);
