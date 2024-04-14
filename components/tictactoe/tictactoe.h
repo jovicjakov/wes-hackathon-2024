@@ -8,6 +8,14 @@ typedef enum
    SERVER
 } tictactoe_turn_t;
 
+typedef enum
+{
+   WIN,
+   LOSS,
+   DRAW,
+   IN_PROGRESS
+} tictactoe_gamestate_t;
+
 typedef struct
 {
    int index_of_X[MAX_SYMBOLS_ON_FIELD];

@@ -121,7 +121,9 @@ static void matrix_event_handler(lv_event_t *e)
     {
         uint32_t id = lv_btnmatrix_get_selected_btn(obj);
         const char *txt = lv_btnmatrix_get_btn_text(obj, id);
+        gui_app_event_t event = id;
         ESP_LOGI(TAG, "%lu was pressed\n", id);
+        xQueueSend(gui_queue, &event, 0U);
     }
 }
 
