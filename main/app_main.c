@@ -11,7 +11,8 @@
 #include "my_mqtt.h"
 #include "temp_hum_sensor.h"
 #include "tictactoe.h"
-#include "joystick.h" #include < stdio.h>
+#include "joystick.h"
+#include <stdio.h>
 #include "../components/morse/inc/button.h"
 #include "../components/led/led.h"
 #include "freertos/task.h"
@@ -25,6 +26,7 @@
 #include "../components/buzzer/buzzer.h"
 #include "driver/gpio.h"
 #include "lis2dh12/lis2dh12.h"
+#include "my_sntp.h"
 
 //---------------------------------- MACROS -----------------------------------
 #define BUZZER_PIN GPIO_NUM_26
@@ -112,6 +114,8 @@ void app_init(void)
     //     ESP_LOGE(TAG, "Failed to initialize joystick: %s", esp_err_to_name(ret));
     //     // Handle critical error or retry logic
     // }
+
+    sntp_app_main();
 }
 
 void app_main(void)

@@ -16,15 +16,13 @@
 #include "driver/gpio.h"
 #include "sdkconfig.h"
 
-#define TAG "joystick"
-#define TASK_STACK_SIZE 2048
-#define TASK_PRIORITY 10
-
 #if CONFIG_IDF_TARGET_ESP32
 #define EXAMPLE_ADC1_CHAN0 ADC_CHANNEL_6
 #define EXAMPLE_ADC1_CHAN1 ADC_CHANNEL_7
 #define EXAMPLE_ADC_ATTEN ADC_ATTEN_DB_11
 #endif
+
+static char const *TAG = "JOYSTICK";
 
 static int adc_raw[2];
 static adc_oneshot_unit_handle_t adc1_handle;
@@ -40,6 +38,8 @@ enum inputs
     INPUT_LEFT_ARROW,
     INPUT_BACK_TO_CENTRE
 };
+
+static int last_input = INPUT_BACK_TO_CENTRE; // Default to centre position at start
 
 // Forward declarations for calibration functions
 static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle);
@@ -67,7 +67,7 @@ void joystick_init(void)
 
     if (joystick_task_handle == NULL)
     {
-        xTaskCreate(joystick_task, "joystick_task", TASK_STACK_SIZE, NULL, TASK_PRIORITY, &joystick_task_handle);
+        xTaskCreate(joystick_task, "joystick_task", 2048, NULL, 5, NULL);
     }
 }
 
@@ -99,53 +99,34 @@ void inputHandler(int input)
     }
 }
 
-static void joystick_task(void *pvParameters)
-{
-    while (true)
-    {
+static void joystick_task(void *pvParameters) {
+    int current_input = INPUT_BACK_TO_CENTRE;
+
+    while (true) {
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
         ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
 
-        if (adc_raw[0] <= 1000)
-        {
-            inputHandler(INPUT_RIGHT_ARROW);
-            while (adc_raw[0] < 1500)
-            {
-                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
-                vTaskDelay(pdMS_TO_TICKS(50));
-            }
-            inputHandler(INPUT_BACK_TO_CENTRE);
+        // Determine the current joystick input based on ADC readings
+        if (adc_raw[0] <= 1000) {
+            current_input = INPUT_RIGHT_ARROW;
+        } else if (adc_raw[0] >= 3500) {
+            current_input = INPUT_LEFT_ARROW;
+        } else if (adc_raw[1] <= 500) {
+            current_input = INPUT_UP_ARROW;
+        } else if (adc_raw[1] >= 4000) {
+            current_input = INPUT_DOWN_ARROW;
+        } else {
+            current_input = INPUT_BACK_TO_CENTRE;
         }
-        else if (adc_raw[0] >= 3500)
-        {
-            inputHandler(INPUT_LEFT_ARROW);
-            while (adc_raw[0] < 1500 || adc_raw[0] > 2500)
-            {
-                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN0, &adc_raw[0]));
-                vTaskDelay(pdMS_TO_TICKS(50));
-            }
-            inputHandler(INPUT_BACK_TO_CENTRE);
+
+        // Call the input handler only if the state has changed
+        if (current_input != last_input) {
+            inputHandler(current_input);
+            last_input = current_input; // Update the last input to the current input
         }
-        else if (adc_raw[1] <= 500)
-        {
-            inputHandler(INPUT_UP_ARROW);
-            while (adc_raw[1] < 1500 || adc_raw[1] > 2500)
-            {
-                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
-                vTaskDelay(pdMS_TO_TICKS(50));
-            }
-            inputHandler(INPUT_BACK_TO_CENTRE);
-        }
-        else if (adc_raw[1] >= 4000)
-        {
-            inputHandler(INPUT_DOWN_ARROW);
-            while (adc_raw[1] < 1500 || adc_raw[1] > 2500)
-            {
-                ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, EXAMPLE_ADC1_CHAN1, &adc_raw[1]));
-                vTaskDelay(pdMS_TO_TICKS(50));
-            }
-            inputHandler(INPUT_BACK_TO_CENTRE);
-        }
+
+        // Regular delay to ensure responsiveness and WDT feeding
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 
