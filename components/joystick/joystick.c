@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "esp_err.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
@@ -49,7 +50,7 @@ static void joystick_task(void *pvParameters);
 void joystick_init(void);
 void inputHandler(int input);
 
-void joystick_init(void)
+esp_err_t joystick_init(void)
 {
     adc_oneshot_unit_init_cfg_t init_config1 = {.unit_id = ADC_UNIT_1};
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
@@ -69,6 +70,8 @@ void joystick_init(void)
     {
         xTaskCreate(joystick_task, "joystick_task", 2048, NULL, 5, NULL);
     }
+
+    return ESP_OK;
 }
 
 void inputHandler(int input)

@@ -1,28 +1,32 @@
+//--------------------------------- INCLUDES ----------------------------------
 #include "my_sntp.h"
 #include "esp_log.h"
 #include "esp_sntp.h"
 #include "nvs_flash.h"
 #include "esp_netif.h"
 
+//---------------------------------- MACROS -----------------------------------
 static const char *TAG = "sntp";
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 48
 #endif
 
-RTC_DATA_ATTR static int boot_count = 0;
+//---------------------- PRIVATE FUNCTION PROTOTYPES --------------------------
 
 static void initialize_time_sync(void);
 static void update_time_and_timezone(void);
 static void log_current_time(void);
 static void setup_sntp(void);
 
+//------------------------- STATIC DATA & CONSTANTS ---------------------------
+RTC_DATA_ATTR static int boot_count = 0;
 static time_t now;
 static struct tm timeinfo;
 static char strftime_buf[64];
-
 QueueHandle_t timeQueue;
 
+//------------------------------ PUBLIC FUNCTIONS -----------------------------
 void updateTimeTask(void *params)
 {
     while (1)
@@ -66,6 +70,7 @@ void sntp_app_main(void)
     xTaskCreate(updateTimeTask, "Update Time Task", 2048, NULL, 5, NULL);
 }
 
+//---------------------------- PRIVATE FUNCTIONS ------------------------------
 static void initialize_time_sync(void)
 {
     ESP_LOGI(TAG, "Starting time synchronization");

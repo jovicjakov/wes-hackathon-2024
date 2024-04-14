@@ -1,7 +1,9 @@
+//--------------------------------- INCLUDES ----------------------------------
 #include "esp_log.h"
 #include "driver/i2c.h"
 #include "math.h"
 
+//---------------------------------- MACROS -----------------------------------
 #define SDA_IO_NUM 22;
 #define SCL_IO_NUM 21;
 
@@ -14,11 +16,13 @@
 #define ACK_VAL 0x0
 #define NACK_VAL 0x1
 
+//-------------------------------- DATA TYPES ---------------------------------
 typedef struct {
     float temperature;
     float humidity;
 } TempHumData;
 
+//---------------------- PUBLIC FUNCTION PROTOTYPES --------------------------
 float getTemperature(void);
 float getHumidity(void);
 esp_err_t temp_sensor_init(void);

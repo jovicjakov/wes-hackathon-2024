@@ -108,12 +108,12 @@ void app_init(void)
     }
 
     // Initialize Joystick
-    joystick_init();
-    // if (ret != ESP_OK)
-    // {
-    //     ESP_LOGE(TAG, "Failed to initialize joystick: %s", esp_err_to_name(ret));
-    //     // Handle critical error or retry logic
-    // }
+    ret = joystick_init();
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to initialize joystick: %s", esp_err_to_name(ret));
+        // Handle critical error or retry logic
+    }
 
     sntp_app_main();
 }

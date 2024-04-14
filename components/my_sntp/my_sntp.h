@@ -1,3 +1,4 @@
+//--------------------------------- INCLUDES ----------------------------------
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -13,6 +14,9 @@
 #include "protocol_examples_common.h"
 #include "esp_sntp.h"
 
+//---------------------------------- MACROS -----------------------------------
+
+//-------------------------------- DATA TYPES ---------------------------------
 typedef struct currentTimeInfo {
     int hour;
     int min;
@@ -23,5 +27,6 @@ typedef struct currentTimeInfo {
     int year;
 } currentTimeInfo;
 
+//---------------------- PUBLIC FUNCTION PROTOTYPES --------------------------
 void sntp_app_main(void);
 currentTimeInfo *fetchTime();

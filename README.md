@@ -1,31 +1,42 @@
-# LVGL project for ESP32
+# ESP32-Powered Tic Tac Toe Game
 
-This is an ESP32 demo project showcasing LVGL v8.3.x with support for several display controllers and touch controllers.
+## Introduction
+This project is a part of our hackathon, where we developed an interactive Tic Tac Toe game that runs on a custom-developed ESP32 devkit. Players can engage with the game via an MQTT topic subscription. Additionally, the GUI provides two main screens – one for playing the game and another for displaying real-time sensor data, including temperature, humidity, and current time. The project also features LED signalization on button presses and a Morse code SOS signal using a buzzer.
 
-- Version of ESP-IDF required 5.0.x
-- Version of LVGL used: 8.3.x
+## Hardware Requirements
+- Custom ESP32 development kit
+- Joystick module for game navigation
+- Temperature and humidity sensor 
+- LEDs for signalization
+- Buzzer for Morse code output
+- Button for initiating SOS signal
+- Screen for GUI display 
 
-## Get started
+## Software Requirements
+- MQTT broker (e.g., Mosquitto)
+- FreeRTOS (for task management and scheduling)
+- LVGL library for GUI rendering
 
-### How is the training structured?
-This training contains the following submodules:
-- [lvgl](https://github.com/lvgl/lvgl)
-- [lvgl_esp32_drivers](https://github.com/lvgl/lvgl_esp32_drivers) (this does not have a support for lvgl 8.3. so we provided a patch for this)
+## Setup Instructions
+1. Flash the provided firmware onto the ESP32 devkit using the ESP-IDF.
+2. Connect the joystick, temperature/humidity sensor, LEDs, buzzer, and button to the designated pins on the ESP32 devkit.
+3. Ensure the ESP32 is connected to the same network as the MQTT broker.
+4. Adjust the `sdkconfig` file if necessary to match your network and MQTT settings.
 
-#### [LVGL](https://github.com/lvgl/lvgl)
+## How to Play
+1. Navigate the Tic Tac Toe grid using the joystick.
+2. Select a cell with a button press on the joystick.
+3. The game state is updated and published to the MQTT topic, allowing for remote play.
+4. An LED indicator will show the current player's turn and winning status.
+5. Press the designated button to send an SOS signal via the buzzer in Morse code.
 
-This submodule we are using is an embedded graphics library used to create beautiful UIs for any MCU, MPU and display types. It provides us with APIs for creating buttons, switches, labels, etc. But, for displaying those objects on our display (model ILI9341) and using the touch screen (XPT2046 touch controller) we are using an additional submodule called lvgl_esp32_drivers.
+## GUI Screens
+- **Game Screen**: Displays the Tic Tac Toe grid and game status.
+- **Sensor Data Screen**: Shows the temperature, humidity, and current time fetched from onboard sensors and the SNTP server.
 
-#### [LVGL_ESP32_DRIVERS](https://github.com/lvgl/lvgl_esp32_drivers)
+## LED Signalization
+- A sequence of LED flashes indicates button press or sensor data publishing.
 
-This submodule enables us to use already implemented functions for displaying objects on different displays and receiving touch information (including our ILI9341 display and XPT2046 touch controller) on ESP32. In `gui.c` we pass those implemented functions as callbacks (for flushing the screen and reading touch input) to the LVGL library.
+## Morse Code SOS Signal
+- Pressing the SOS button will trigger the buzzer to emit an SOS signal in Morse code.
 
-Those two submodules together make lives easier for creating embedded graphics on ESP32.
-
-### Configuration
-
-The project is already set up for Byte Lab Development Kit. If you want to use it on your custom board, you will have to make a few changes.
-1. Open SDK configuration editor (menuconfig) and navigate to **LVGL TFT Display controller**.
-1. Select a display model you are using. Make sure to choose appropriate communication bus, transfer modes and then assign pins in **Display Pin Assignments** section.
-1. Navigate to **LVGL Touch controller** and select a touch panel you are using. Find your model in **Touchpanel Pin Assignment** and assign pins accordingly.
-1. Be careful to change the horizontal and vertical screen resolution, if necessary.

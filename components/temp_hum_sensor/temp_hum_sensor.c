@@ -1,17 +1,25 @@
+//--------------------------------- INCLUDES ----------------------------------
 #include "temp_hum_sensor.h"
 #include "freertos/projdefs.h"
 
+//---------------------------------- MACROS -----------------------------------
 static const char *TAG = "SENSORS";
-static i2c_port_t i2c_port = I2C_NUM_1;
 
+//---------------------- PRIVATE FUNCTION PROTOTYPES --------------------------
 static void temp_hum_sensor_task(void *pvParameters);
 
-QueueHandle_t temperature_change_queue = NULL;
+static uint8_t sht31_crc(uint8_t *data);
 
-extern TempHumData;
+static esp_err_t sht31_read_temp_humi(float *temp, float *humi);
 
+//------------------------- STATIC DATA & CONSTANTS ---------------------------
+static i2c_port_t i2c_port = I2C_NUM_1;
+
+//------------------------------- GLOBAL DATA ---------------------------------
 extern QueueHandle_t temp_hum_to_gui_queue;
 
+QueueHandle_t temperature_change_queue = NULL;
+//------------------------------ PUBLIC FUNCTIONS -----------------------------
 esp_err_t temp_sensor_init(void)
 {
     i2c_config_t conf;
@@ -39,6 +47,7 @@ esp_err_t temp_sensor_init(void)
     return ESP_OK;
 }
 
+//---------------------------- PRIVATE FUNCTIONS ------------------------------
 static void temp_hum_sensor_task(void *pvParameters)
 {
     static float last_temp = 0.0; // Stores the last temperature reading
