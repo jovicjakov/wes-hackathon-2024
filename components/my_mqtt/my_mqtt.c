@@ -133,32 +133,35 @@ static char *create_json_payload_game(tictactoe_handler_t *game_data)
     cJSON *jsonIndexO = cJSON_CreateArray();
 
     // Populate jsonIndexX only with indices where the value is 1
-    for (int i = 0; i < 9; i++) {
-        if (game_data->index_of_X[i] == 1) {
+    for (int i = 0; i < 9; i++)
+    {
+        if (game_data->index_of_X[i] == 1)
+        {
             cJSON_AddItemToArray(jsonIndexX, cJSON_CreateNumber(i));
         }
     }
 
     // Populate jsonIndexO only with indices where the value is 1
-    for (int i = 0; i < 9; i++) {
-        if (game_data->index_of_O[i] == 1) {
+    for (int i = 0; i < 9; i++)
+    {
+        if (game_data->index_of_O[i] == 1)
+        {
             cJSON_AddItemToArray(jsonIndexO, cJSON_CreateNumber(i));
         }
     }
 
-    const char *turnString = game_data->turn == 0 ? "server" : "device"; // Maintain case consistency
+    const char *turnString = game_data->turn == 1 ? "server" : "device"; // Maintain case consistency
 
     cJSON_AddItemToObject(root, "indexX", jsonIndexX);
     cJSON_AddItemToObject(root, "indexO", jsonIndexO);
     cJSON_AddStringToObject(root, "turn", turnString);
 
     char *formatted_json = cJSON_PrintUnformatted(root); // Use cJSON_PrintUnformatted for compact output without format
-    //printf("JSON Output: %s\n", formatted_json);
+    // printf("JSON Output: %s\n", formatted_json);
 
     cJSON_Delete(root); // Properly delete the root object to avoid memory leaks
     return formatted_json;
 }
-
 
 //---------------------------- EVENT HANDLERS -----------------------------
 
@@ -185,7 +188,7 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
 
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        //char *json_payload = create_json_payload();
+        // char *json_payload = create_json_payload();
 
         // vTaskDelay(1000 / portTICK_PERIOD_MS);
         // ESP_LOGI(TAG, "Publishing to topic WES/Uranus/sensors on INIT");
@@ -212,8 +215,8 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
         break;
 
     case MQTT_EVENT_DATA:
-        ESP_LOGI(TAG, "MQTT_EVENT_DATA Received");
-        printf("Received: Topic=%.*s, Data=%.*s\n", event->topic_len, event->topic, event->data_len, event->data);
+
+        printf("Data: Topic=%.*s, Data=%.*s\n", event->topic_len, event->topic, event->data_len, event->data);
 
         // Parse the JSON payload from the received data
         cJSON *root = cJSON_ParseWithLength(event->data, event->data_len);
@@ -229,11 +232,11 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
         else
         {
             cJSON *turn = cJSON_GetObjectItemCaseSensitive(root, "turn");
-            if (strcmp(turn->valuestring, "server") == 0) break;
+            if (strcmp(turn->valuestring, "server") == 0)
+                break;
 
             cJSON *indexX = cJSON_GetObjectItemCaseSensitive(root, "indexX");
             cJSON *indexO = cJSON_GetObjectItemCaseSensitive(root, "indexO");
-            
 
             if (cJSON_IsArray(indexX) && cJSON_IsArray(indexO) && cJSON_IsString(turn))
             {
@@ -254,7 +257,7 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
                 }
 
                 // Fill indexX array
-                //printf("IndexX: ");
+                // printf("IndexX: ");
                 int count = cJSON_GetArraySize(indexX);
                 count = count > 9 ? 9 : count; // Ensure not to overflow the array
                 for (int i = 0; i < count; i++)
@@ -262,14 +265,14 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
                     cJSON *ix = cJSON_GetArrayItem(indexX, i);
                     if (cJSON_IsNumber(ix))
                     {
-                        game_state.index_of_X[i] = ix->valueint;
-                        printf("%d ", ix->valueint);
+                        game_state.index_of_X[ix->valueint] = 1;
+                        // printf("%d ", ix->valueint);
                     }
                 }
-                //printf("\n");
+                // printf("\n");
 
                 // Fill indexO array
-                //printf("IndexO: ");
+                // printf("IndexO: ");
                 count = cJSON_GetArraySize(indexO);
                 count = count > 9 ? 9 : count; // Ensure not to overflow the array
                 for (int i = 0; i < count; i++)
@@ -277,15 +280,16 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
                     cJSON *io = cJSON_GetArrayItem(indexO, i);
                     if (cJSON_IsNumber(io))
                     {
-                        game_state.index_of_O[i] = io->valueint;
-                        printf("%d ", io->valueint);
+                        game_state.index_of_O[io->valueint] = 1;
+                        // printf("%d ", io->valueint);
                     }
                 }
-                //printf("\n");
-                // printf("%d", game_state.turn);
                 // printf("\n");
-                // Send the game state to the queue
-                if (game_state.turn == DEVICE) {
+                //  printf("%d", game_state.turn);
+                //  printf("\n");
+                //  Send the game state to the queue
+                if (game_state.turn == DEVICE)
+                {
                     ESP_LOGI(TAG, "MQTT_EVENT_DATA from EARTH Received");
                     if ((xQueueSend(p_tictactoe_queue_rec, &game_state, 0U) != pdPASS))
                     {
@@ -347,7 +351,7 @@ static void my_mqtt_task(void *pvParameters)
         {
             ESP_LOGI(TAG, "Publishing move!");
             char *json_payload = create_json_payload_game(&tictactoe_msg);
-            if (json_payload != NULL)   
+            if (json_payload != NULL)
             {
                 ESP_LOGI(TAG, "%s", json_payload);
                 esp_mqtt_client_publish(client, "WES/Uranus/game", json_payload, 0, 1, 0);
