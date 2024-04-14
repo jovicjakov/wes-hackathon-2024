@@ -47,7 +47,6 @@ static bool example_adc_calibration_init(adc_unit_t unit, adc_channel_t channel,
 static void example_adc_calibration_deinit(adc_cali_handle_t handle);
 
 static void joystick_task(void *pvParameters);
-void joystick_init(void);
 void inputHandler(int input);
 
 esp_err_t joystick_init(void)

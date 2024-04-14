@@ -210,7 +210,7 @@ static void select_first_player_buttons_init(void)
 
 static void sensor_table_init()
 {
-    lv_table_set_cell_value(table, 0, 0, "Time");
+    lv_table_set_cell_value(table, 0, 0, "Date and Time");
     lv_table_set_cell_value(table, 1, 0, "Temperature");
     lv_table_set_cell_value(table, 2, 0, "Humidity");
     lv_table_set_cell_value(table, 0, 1, " ");
@@ -278,9 +278,10 @@ static void _wait_for_sensor_input_task(void *p_parameter)
         if (timeQueue != NULL && (xQueueReceive(timeQueue, &timeinfo, 100 / portTICK_PERIOD_MS) == pdTRUE))
         {
 
-            char time[6];
-            sprintf(time, "%d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
-            lv_table_set_cell_value(table, 0, 1, time);
+            char dateTime[30]; // Increase buffer size to hold the full date and time
+            // Format the time string to include the date as well (e.g., "YYYY-MM-DD HH:MM")
+            strftime(dateTime, sizeof(dateTime), "%Y-%m-%d %H:%M", &timeinfo);
+            lv_table_set_cell_value(table, 0, 1, dateTime);
         }
         if (joystick_to_gui_queue != NULL && (xQueueReceive(joystick_to_gui_queue, &switch_screen, 200 / portTICK_PERIOD_MS) == pdTRUE))
         {
