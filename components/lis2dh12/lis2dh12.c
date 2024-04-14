@@ -3,9 +3,10 @@
 #include "freertos/FreeRTOS.h"
 #include <stdio.h>
 #include "driver/i2c.h"
+#include "hal/gpio_types.h"
 #include <esp_log.h>
 
-#define I2C_MASTER_FREQ_HZ 100000
+#define I2C_MASTER_FREQ_HZ 10000
 #define WRITE_BIT 0       /*!< I2C master write */
 #define READ_BIT 1        /*!< I2C master read */
 #define ACK_CHECK_EN 0x1  /*!< I2C master will check ack from slave*/
@@ -19,9 +20,12 @@
 #define LIS_DEVICE_ADDRESS 24
 #define LIS_I2C_PORT_NUM I2C_NUM_1
 
+#define LIS2DH12_ADDR 0x18  // Use 0x19 if SA0 is high
+
+static lis_handle_t lis_handle;  // Static global within this module
+
 void lis_task(void *pvParameters);
 
-lis_handle_t lis_handle;
 
 static const char *TAG = "LISD2DH12";
 
@@ -77,42 +81,50 @@ esp_err_t lis_init(void)
         .port_num = I2C_NUM_1,
     };
 
-    lis_handle = malloc(sizeof(lis_handle_t));
+    lis_handle = malloc(sizeof(lis_t));
+    if (!lis_handle) {
+        ESP_LOGE(TAG, "Failed to allocate memory for LIS handle");
+        return ESP_ERR_NO_MEM;
+    }
 
     lis_handle->device_address = lis_config.device_address;
     lis_handle->port_num = lis_config.port_num;
     lis_handle->range = lis_config.range;
     lis_handle->mg_scale = lis_set_range(lis_config.range);
+
     i2c_config_t conf;
     conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = lis_config.sda_pin;
-    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_io_num = lis_config.scl_pin;
-    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
-    i2c_param_config(lis_handle->port_num, &conf);
-    esp_err_t ret = i2c_driver_install(lis_handle->port_num, conf.mode, 0, 0, 0);
-    if (ret == ESP_FAIL) {
-        return NULL;
-    }
+    conf.sda_io_num = 22;
+    conf.sda_pullup_en = GPIO_PULLUP_DISABLE;
+    conf.scl_io_num = 21;
+    conf.scl_pullup_en = GPIO_PULLUP_DISABLE;
+    conf.master.clk_speed = 100000;
+    conf.clk_flags = 0;
+
+    ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_1, &conf));
+    ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_1, conf.mode, 0, 0, 0));
+
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (lis_handle->device_address << 1) | WRITE_BIT, ACK_CHECK_EN);
     i2c_master_write_byte(cmd, 0x0F, ACK_CHECK_EN); // WHO_AM-I reg
     i2c_master_stop(cmd);
-    ret = i2c_master_cmd_begin(lis_handle->port_num, cmd, 1000 / portTICK_PERIOD_MS);
+    int ret = i2c_master_cmd_begin(lis_handle->port_num, cmd, 1000 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
+
     if (ret != ESP_OK) {
-        return NULL;
+        //ESP_LOGI(TAG, "FAILED IN LINE 116");
+        return ESP_FAIL;
     }
     else {
         uint8_t ctrl_reg_values[6] = {0x2F, 0x00, 0x00, lis_handle->range, 0x00, 0x00};
         ret = write_reg_multibyte(lis_handle, 0xA0, ctrl_reg_values, 6);
         if (ret != ESP_OK) {
-            return NULL;
+            //ESP_LOGI(TAG, "FAILED IN LINE 123");
+            return ESP_FAIL;
         }
     }
-
+    
     xTaskCreate(lis_task, "lis_task", 2048, NULL, 10, NULL);
 
     return ESP_OK;
@@ -170,7 +182,7 @@ void lis_task(void *pvParameters) {
             lis_mg_scale(lis_handle, &x, &y, &z);
             // Log the acceleration data
             ESP_LOGI(TAG, "Accel data: x=%d mg, y=%d mg, z=%d mg", x, y, z);
-        } else {
+            } else {
             ESP_LOGE(TAG, "Failed to read acceleration data");
         }
 

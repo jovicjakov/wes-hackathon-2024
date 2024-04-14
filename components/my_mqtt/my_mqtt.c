@@ -56,6 +56,8 @@ static void mqtt_temp_hum_task(void *pvParameters);
 
 //------------------------- STATIC DATA & CONSTANTS ---------------------------
 
+static int mqtt_connected = 0;
+
 //------------------------------- GLOBAL DATA ---------------------------------
 esp_mqtt_client_handle_t client;
 extern QueueHandle_t p_tictactoe_queue_send;
@@ -94,6 +96,11 @@ esp_err_t my_mqtt_init()
     mqtt5_app_start();
 
     return ESP_OK;
+}
+
+int is_mqtt_connected() 
+{
+    return mqtt_connected == 0 ? 0 : 1;
 }
 
 //---------------------------- PRIVATE FUNCTIONS ------------------------------
@@ -198,6 +205,7 @@ static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
         esp_mqtt_client_subscribe(client, "WES/Uranus/game", 0);
         ESP_LOGI(TAG, "Subscribed to topic WES/Uranus/game !");
+        mqtt_connected = 1;
         break;
 
     case MQTT_EVENT_DISCONNECTED:

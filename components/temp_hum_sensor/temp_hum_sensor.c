@@ -1,4 +1,5 @@
 #include "temp_hum_sensor.h"
+#include "freertos/projdefs.h"
 
 static const char *TAG = "SENSORS";
 static i2c_port_t i2c_port = I2C_NUM_1;
@@ -8,6 +9,8 @@ static void temp_hum_sensor_task(void *pvParameters);
 QueueHandle_t temperature_change_queue = NULL;
 
 extern TempHumData;
+
+extern QueueHandle_t temp_gum_to_gui_queue;
 
 esp_err_t temp_sensor_init(void) {
     i2c_config_t conf;
@@ -47,6 +50,9 @@ static void temp_hum_sensor_task(void *pvParameters) {
                 if (temperature_change_queue != NULL) {
                     if (xQueueSend(temperature_change_queue, &data, 0) != pdPASS) {
                         //ESP_LOGE(TAG, "Failed to send temperature and humidity to queue");
+                    if (xQueueSend(temp_gum_to_gui_queue, &data, 0) != pdPASS) {
+                        //ESP_LOGE(TAG, "Failed to send temperature and humidity to gui queue");
+                    }
                     } else {
                         //ESP_LOGI(TAG, "Succesfully pushed to temperature_change_queue!");
                         ESP_LOGI(TAG, "SENSOR READ: Temperature: %.2f°C, Humidity: %.2f%%", data.temperature, data.humidity);

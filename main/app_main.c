@@ -54,12 +54,13 @@ void app_init(void) {
         ESP_LOGE(TAG, "Failed to initialize temperature sensor: %s", esp_err_to_name(ret));
     }
 
-   // Initialize PWM
-    ret = lis_init();
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to initialize PWM: %s", esp_err_to_name(ret));
-    }
-
+   // // Initialize PWM
+   //  ret = lis_init();
+   //  if (ret != ESP_OK) {
+   //      ESP_LOGE(TAG, "Failed to initialize ACC SENSOR: %s", esp_err_to_name(ret));
+   //  } else {
+   //      ESP_LOGE(TAG, "SUCCESS!!");
+   //  }
 
     // Initialize MQTT
     ret = my_mqtt_init();
